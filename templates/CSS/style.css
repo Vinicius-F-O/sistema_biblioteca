@@ -1,0 +1,234 @@
+@import url("https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+a {
+  text-decoration: none;
+}
+
+li {
+  list-style: none;
+}
+
+body {
+  font-family: "Poppins", serif;
+}
+
+.wrapper {
+  display: flex;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  transition: all 0.25s ease-in-out;
+  background-color: #fff;
+}
+
+#sidebar {
+  width: 90px;
+  min-width: 90px;
+  transition: all 0.25s ease-in-out;
+  background-color: #0b0f19;
+  display: flex;
+  flex-direction: column;
+}
+
+#sidebar.expand {
+  width: 260px;
+  min-width: 260px;
+}
+
+#sidebar:not(.expand) .sidebar-logo,
+#sidebar:not(.expand) a.sidebar-link span,
+#sidebar:not(.expand) span.sidebar-subtitle {
+  display: none;
+}
+
+.toggle-btn {
+  width: 30px;
+  height: 30px;
+  color: #fff;
+  border-radius: 0.425rem;
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #323c55;
+}
+
+.toggle-btn i {
+  color: #fff;
+}
+
+#sidebar.expand .sidebar-logo,
+#sidebar.expand a.sidebar-link span,
+#sidebar.expand span.sidebar-subtitle {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.sidebar-logo a {
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+/* a partir daqui é teste*/
+
+.sidebar-nav {
+  padding: 0.7rem 0;
+  flex: 11 auto;
+  z-index: 10;
+}
+
+a.sidebar-link {
+  padding: 0.625rem 1.625rem;
+  color: #fff;
+  display: block;
+  white-space: nowrap;
+  font-weight: 700;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-link i {
+  font-size: 1.1rem;
+  margin-right: 0.75rem;
+}
+
+a.sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.075);
+  border-left: 3px solid #3b7ddd;
+}
+
+.sidebar-item {
+  position: relative;
+}
+
+.sidebar-subtitle {
+  padding: 0.625rem 1.625rem;
+  color: rgba(255, 255, 255, 0.25);
+  display: block;
+  white-space: nowrap;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+}
+
+.navbar {
+  background-color: #fff;
+  box-shadow: 0 0 2rem 0 rgba(33, 37, 41, 0.1);
+}
+
+.navbar-expand .navbar-collapse {
+  min-width: 200px;
+}
+
+.avatar {
+  height: 50px;
+  width: 50px;
+}
+
+.chart-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: fit-content;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 2vh;
+}
+
+/* Badges para os tipos de status */
+
+.status-badge-sucess {
+  background-color: #25d6aa; /* verde claro */
+  color: #107842; /* verde escuro */
+  padding: 0.25em 0.5em;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-badge-warning {
+  background-color: #fff3cd; /* amarelo claro */
+  color: #664d03; /* amarelo escuro */
+  padding: 0.25em 0.5em;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-badge-danger {
+  background-color: #f8d7da; /* vermelho claro */
+  color: #842029; /* vermelho escuro */
+  padding: 0.25em 0.5em;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-badge-neutral {
+  background-color: #e2e3e5; /* cinza claro */
+  color: #41464b; /* cinza escuro */
+  padding: 0.25em 0.5em;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.table-dashboard {
+  overflow: hidden;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 2vh;
+}
+
+.botao-dropdown {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.icon-dropdown {
+  font-size: 20px; /* Altere esse valor conforme o tamanho desejado */
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.icon-trending-up {
+  font-size: 1.5rem; /* Altere esse valor conforme o tamanho desejado */
+  line-height: 1;
+  vertical-align: middle;
+  color: #107842;
+}
+
+.icon-book-card {
+  font-size: 2rem; /* Altere esse valor conforme o tamanho desejado */
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.botao-notifica {
+  font-size: 1.5rem; /* Altere esse valor conforme o tamanho desejado */
+  line-height: 1;
+  vertical-align: middle;
+}
