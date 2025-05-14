@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque - Sistema de Biblioteca</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estoque-styles.css') }}">
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div
+                class="sidebar-header p-3 d-flex justify-content-between align-items-center border-bottom border-light border-opacity-10">
+                <h2 class="m-0 fs-5 d-flex align-items-center gap-2">
+                    <i class="fas fa-book"></i>
+                    <span class="sidebar-text">Codex</span>
+                </h2>
+                <button class="toggle-btn btn btn-link text-white p-0" id="toggle-btn">
+                    <i id="sidebar-toggle-icon" class="fas fa-bars"></i>
+                </button>
+            </div>
+            <ul class="sidebar-menu list-unstyled p-0 m-0">
+                <li>
+                    <a href="/" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-home mx-2"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="/estoque" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-book-open mx-2"></i>
+                        <span class="sidebar-text">Estoque</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-users mx-2"></i>
+                        <span class="sidebar-text">Usuários</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-exchange-alt mx-2"></i>
+                        <span class="sidebar-text">Empréstimos & vendas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-chart-bar mx-2"></i>
+                        <span class="sidebar-text">Relatórios</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-cog mx-2"></i>
+                        <span class="sidebar-text">Configurações</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer p-3 border-top border-light border-opacity-10 position-absolute bottom-0 w-100">
+                <a href="#" class="text-white text-decoration-none d-flex align-items-center">
+                    <i class="fas fa-question-circle mx-2"></i>
+                    <span class="sidebar-text">Ajuda</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content flex-grow-1 p-3">
+            <!-- Top Bar with User Profile -->
+            <div class="d-flex justify-content-end align-items-center mb-4 gap-4 px-3">
+                <i class="fa-solid fa-bell icon-notification"></i>
+                <div class="user-profile d-flex align-items-center gap-2 cursor-pointer">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Profile" class="profile-img">
+                    <div class="profile-info d-flex flex-column">
+                        <span class="profile-name fw-bold fs-6">Ana Silva</span>
+                        <span class="profile-role text-muted small">Bibliotecária</span>
+                    </div>
+                    <i class="fas fa-chevron-down text-muted small"></i>
+                </div>
+            </div>
+
+            <!-- Estoque Content -->
+            <div class="estoque-content">
+                <h1 class="estoque-title fs-3 fw-bold mb-4 text-dark">Estoque</h1>
+
+                <!-- Barra de Busca e Ações -->
+                <div class="barra-container mb-0">
+                    <div class="row barra-busca mx-0">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Buscar livro, valor ou código...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-filter"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-adicionar border-0">
+                                <i class="fas fa-plus"></i> Cadastrar Novo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Informações de Estoque sem cards -->
+                <div class="row barra-status mx-0 mb-5">
+                    <div class="col-md-6 col-lg-2">
+                        <div class="h-100">
+                            <h3 class="fs-6 text-muted mb-1">Valor em Estoque</h3>
+                            <p class="fs-5 fw-bold">R$ 24.568,90</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <div class="h-100">
+                            <h3 class="fs-6 text-muted mb-1">Custo do Estoque</h3>
+                            <p class="fs-5 fw-bold">R$ 18.245,50</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <div class="h-100">
+                            <h3 class="fs-6 text-muted mb-1">Lucro Previsto</h3>
+                            <p class="fs-5 fw-bold">R$ 6.323,40</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <div class="h-100">
+                            <h3 class="fs-6 text-muted mb-1">Estoque Baixo</h3>
+                            <div class="d-flex justify-content-start align-items-baseline gap-2">
+                                <div class="circulo-warning"></div>
+                                <p class="fs-5 fw-bold">12 itens</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <div class="h-100">
+                            <h3 class="fs-6 text-muted mb-1">Sem Estoque</h3>
+                            <div class="d-flex justify-content-start align-items-baseline gap-2">
+                                <div class="circulo-danger"></div>
+                                <p class="fs-5 fw-bold">5 itens</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-2">
+                        <div class="h-100">
+                            <h3 class="fs-6 text-muted mb-1">Em Estoque</h3>
+                            <p class="fs-5 fw-bold">245 itens</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Estoque -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-borderless mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="50"></th>
+                                        <th>Produto</th>
+                                        <th>Gênero</th>
+                                        <th>Estoque</th>
+                                        <th>Preço</th>
+                                        <th>Catálogo</th>
+                                        <th width="120">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-sm btn-link text-warning">
+                                                <i class="far fa-star"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="https://m.media-amazon.com/images/I/71aLultW5EL._AC_UF1000,1000_QL80_.jpg"
+                                                    alt="Capa do Livro" class="book-cover-small me-2">
+                                                <div>
+                                                    <div class="fw-bold">1984</div>
+                                                    <small class="text-muted">George Orwell</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Ficção Distópica</td>
+                                        <td>
+                                            <span class="badge bg-success">15</span>
+                                        </td>
+                                        <td>R$ 49,90</td>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="catalogo1" checked>
+                                                <label class="form-check-label" for="catalogo1"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-sm btn-link text-warning">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="https://m.media-amazon.com/images/I/71hTq+qHT-L._AC_UF1000,1000_QL80_.jpg"
+                                                    alt="Capa do Livro" class="book-cover-small me-2">
+                                                <div>
+                                                    <div class="fw-bold">O Pequeno Príncipe</div>
+                                                    <small class="text-muted">Antoine de Saint-Exupéry</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Literatura Infantil</td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark">2</span>
+                                        </td>
+                                        <td>R$ 34,90</td>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="catalogo2" checked>
+                                                <label class="form-check-label" for="catalogo2"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-sm btn-link text-warning">
+                                                <i class="far fa-star"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="https://m.media-amazon.com/images/I/91SZSW8qSsL._AC_UF1000,1000_QL80_.jpg"
+                                                    alt="Capa do Livro" class="book-cover-small me-2">
+                                                <div>
+                                                    <div class="fw-bold">Dom Quixote</div>
+                                                    <small class="text-muted">Miguel de Cervantes</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Clássico</td>
+                                        <td>
+                                            <span class="badge bg-success">8</span>
+                                        </td>
+                                        <td>R$ 59,90</td>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="catalogo3">
+                                                <label class="form-check-label" for="catalogo3"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-sm btn-link text-warning">
+                                                <i class="far fa-star"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="https://m.media-amazon.com/images/I/71X1p4TGlxL._AC_UF1000,1000_QL80_.jpg"
+                                                    alt="Capa do Livro" class="book-cover-small me-2">
+                                                <div>
+                                                    <div class="fw-bold">Orgulho e Preconceito</div>
+                                                    <small class="text-muted">Jane Austen</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Romance</td>
+                                        <td>
+                                            <span class="badge bg-danger">0</span>
+                                        </td>
+                                        <td>R$ 39,90</td>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="catalogo4" checked>
+                                                <label class="form-check-label" for="catalogo4"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-sm btn-link text-warning">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="https://m.media-amazon.com/images/I/81dQwQlmAXL._AC_UF1000,1000_QL80_.jpg"
+                                                    alt="Capa do Livro" class="book-cover-small me-2">
+                                                <div>
+                                                    <div class="fw-bold">A Revolução dos Bichos</div>
+                                                    <small class="text-muted">George Orwell</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Sátira Política</td>
+                                        <td>
+                                            <span class="badge bg-success">12</span>
+                                        </td>
+                                        <td>R$ 29,90</td>
+                                        <td>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="catalogo5" checked>
+                                                <label class="form-check-label" for="catalogo5"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            Mostrando 1 a 5 de 124 itens
+                        </div>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">Anterior</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Próxima</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript Personalizado -->
+    <script src="{{ url_for('static', filename='js/estoque-scripts.js') }}"></script>
+</body>
+
+</html>

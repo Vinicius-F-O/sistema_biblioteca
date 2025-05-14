@@ -1,338 +1,347 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Dashboard - Sistema de Biblioteca</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="CSS/style.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
-    <div class="wrapper">
-        <!--Aqui estou setando a sidebar-->
-        <aside id="sidebar" class="expand">
-            <div class="d-flex justify-content-between p-4">
-                <div class="sidebar-logo">
-                    <a href="#">Codex</a>
-                </div>
-                <button class="toggle-btn border-0" type="button">
-                    <i id="icon" class='bx bxs-chevrons-right'></i>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div
+                class="sidebar-header p-3 d-flex justify-content-between align-items-center border-bottom border-light border-opacity-10">
+                <h2 class="m-0 fs-5 d-flex align-items-center gap-2">
+                    <i class="fas fa-book"></i>
+                    <span class="sidebar-text">Codex</span>
+                </h2>
+                <button class="toggle-btn btn btn-link text-white p-0" id="toggle-btn">
+                    <i id="sidebar-toggle-icon" class="fas fa-bars"></i>
                 </button>
             </div>
-            <ul class="sidebar-nav">
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class='bx bxs-dashboard'></i>
-                        <span>Dashboard</span>
+            <ul class="sidebar-menu list-unstyled p-0 m-0">
+                <li class="active">
+                    <a href="" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-home mx-2"></i>
+                        <span class="sidebar-text">Dashboard</span>
                     </a>
                 </li>
-                <span class="sidebar-subtitle">Vendas</span>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class='bx bxs-book'></i>
-                        <span>Estoque</span>
+                <li>
+                    <a href="/estoque" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-book-open mx-2"></i>
+                        <span class="sidebar-text">Estoque</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-users mx-2"></i>
+                        <span class="sidebar-text">Usuários</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-exchange-alt mx-2"></i>
+                        <span class="sidebar-text">Empréstimos & vendas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-chart-bar mx-2"></i>
+                        <span class="sidebar-text">Relatórios</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                        <i class="fas fa-cog mx-2"></i>
+                        <span class="sidebar-text">Configurações</span>
                     </a>
                 </li>
             </ul>
+            <div class="sidebar-footer p-3 border-top border-light border-opacity-10 position-absolute bottom-0 w-100">
+                <a href="#" class="text-white text-decoration-none d-flex align-items-center">
+                    <i class="fas fa-question-circle mx-2"></i>
+                    <span class="sidebar-text">Ajuda</span>
+                </a>
+            </div>
         </aside>
-        <div class="main">
-            <!--Aqui estou setando a navbar-->
-            <nav class="navbar navbar-expand px-4 py-3">
-                <form action="#" class="d-none d-sm-inline-block">
-                    <div class="input-group input-group-navbar">
-                        <input type="text" class="form-control border-0 rounded-0 pe-0" placeholder="Search..."
-                            aria-label="Search">
-                        <button class="btn border-0 rounded-0" type="button">
-                            <i class='bx bx-search'></i>
-                        </button>
-                    </div>
-                </form>
-                <div class="navbar-collapse collapse">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item dropdown">
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="d-flex align-items-center gap-3">                                            
-                                            <button class="btn border-0 p-0 botao-notifica" type="button" id="notification-btn">
-                                                <i class='bx bx-bell'></i>
-                                            </button>
-                                            <a href="#" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
-                                                <div class="container">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="d-flex align-items-center gap-3">
-                                                                <!-- Imagem do avatar -->
-                                                                <img src="/templates/img/3a7f7feec2ff8350ab8ff7f3fc5041af.jpg"
-                                                                    class="avatar img-fluid rounded-5" alt="profile picture">
-                
-                                                                <!-- Spans empilhados verticalmente -->
-                                                                <div class="d-flex flex-column">
-                                                                    <span class="fw-bold fs-6 text-dark">Vinícius F.</span>
-                                                                    <span class="fs-6 text-muted">Operador</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-end rounded-0 border-0 shadow mt-3">
-                                                <a href="#" class="dropdown-item">
-                                                    <i class='bx bx-data'></i>
-                                                    <span>Analytics</span>
-                                                </a>
-                                                <a href="#" class="dropdown-item">
-                                                    <i class='bx bx-data'></i>
-                                                    <span>Settings</span>
-                                                </a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-                                                    <i class='bx bx-help-circle'></i>
-                                                    <span>Help Center</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-            <main class="content px-3 py4">
-                <div class="container-fluid">
-                    <div class="mb-3">
-                        <h3 class="fw-bold fs-4 py-2">
-                            Dashboard
-                        </h3>
-                        <div class="row g-3">
-                            <div class="col-12 col-lg-10">
-                                <div class="row justify-content-evenly">
-                                    <!--Aqui estou criando os cards-->
-                                    <div class="col-12 col-md-3">
-                                        <div class="card shadow">
-                                            <div class="card-body py-4">
-                                                <div class="container mb-5">
-                                                    <div class="row">
-                                                        <div class="col-12 p-0">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-between gap-3">
-                                                                <h6 class="mb-2 fw-bold fs-5">
-                                                                    Empréstimos
-                                                                </h6>
-                                                                <i class='bx bxs-book icon-book-card'></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <p class="fw-bold mb-2 fs-3">
-                                                    52.003
-                                                </p>
-                                                <div class="container p-0">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <i class='bx bx-trending-up icon-trending-up'></i>
-                                                                <span class="text-success">
-                                                                    17%
-                                                                </span>
-                                                                <span class="fw-bold">
-                                                                    Na última semana
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-3">
-                                        <div class="card shadow">
-                                            <div class="card-body py-4">
-                                                <div class="container mb-5">
-                                                    <div class="row">
-                                                        <div class="col-12 p-0">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-between gap-3">
-                                                                <h6 class="mb-2 fw-bold fs-5">
-                                                                    Vendas
-                                                                </h6>
-                                                                <i class='bx bxs-book icon-book-card'></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <p class="fw-bold mb-2 fs-3">
-                                                    101.523
-                                                </p>
-                                                <div class="container p-0">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <i class='bx bx-trending-up icon-trending-up'></i>
-                                                                <span class="text-success">
-                                                                    23%
-                                                                </span>
-                                                                <span class="fw-bold">
-                                                                    Na última semana
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-3">
-                                        <div class="card shadow">
-                                            <div class="card-body py-4">
-                                                <div class="container mb-5">
-                                                    <div class="row">
-                                                        <div class="col-12 p-0">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-between gap-3">
-                                                                <h6 class="mb-2 fw-bold fs-5">
-                                                                    Contatos
-                                                                </h6>
-                                                                <i class='bx bxs-book icon-book-card'></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <p class="fw-bold mb-2 fs-3">
-                                                    74.315
-                                                </p>
-                                                <div class="container p-0">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <i class='bx bx-trending-up icon-trending-up'></i>
-                                                                <span class="text-success">
-                                                                    35%
-                                                                </span>
-                                                                <span class="fw-bold">
-                                                                    Na última semana
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-12 col-md-5 offset-md-1">
-                                            <div class="chart-container">
-                                                <div class="d-flex align-items-center mb-2 gap-2">
-                                                    <button class="botao-dropdown btn border-0 p-0" type="button">
-                                                        <i class='bx bxs-chevron-down icon-dropdown'></i>
-                                                    </button>
-                                                    <h3 class="fw-bold fs-6 mb-0">
-                                                        Empréstimos recentes
-                                                    </h3>
-                                                </div>
-                                                <canvas id="line-chart"></canvas>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 col-md-5">
-                                            <div class="chart-container">
-                                                <div class="d-flex align-items-center mb-2 gap-2">
-                                                    <button class="botao-dropdown btn border-0 p-0" type="button">
-                                                        <i class='bx bxs-chevron-down icon-dropdown'></i>
-                                                    </button>
-                                                    <h3 class="fw-bold fs-6 mb-0">
-                                                        Empréstimos recentes
-                                                    </h3>
-                                                </div>
-                                                <canvas id="bar-chart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 mt-3">
-                                        <div class="table-dashboard">
-                                            <h3 class="fw-bold fs-4 my-2">Últimos serviços</h3>
-                                            <table class="table table-borderless table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Nome</th>
-                                                        <th scope="col">Livro</th>
-                                                        <th scope="col">Categoria</th>
-                                                        <th scope="col">Funcionário</th>
-                                                        <th scope="col">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>Anna</td>
-                                                        <td>It a coisa</td>
-                                                        <td>Empréstimo</td>
-                                                        <td>Heitor</td>
-                                                        <td>
-                                                            <span class="status-badge-sucess">devolvido</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Julio</td>
-                                                        <td>YOU</td>
-                                                        <td>Empréstimo</td>
-                                                        <td>Caio</td>
-                                                        <td>
-                                                            <span class="status-badge-warning">devolvido fora de
-                                                                prazo</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Lucas</td>
-                                                        <td>Harry potter</td>
-                                                        <td>Venda</td>
-                                                        <td>Heitor</td>
-                                                        <td>
-                                                            <span class="status-badge-neutral">Venda efetuada</span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-lg-2">
-                                <div class="bg-white shadow rounded-2 p-3 h-100 overflow-hidden">
-                                    <h3 class="fw-bold fs-5">Produtos populares</h3>
-                                    <!--A partir daqui vou listar os produtos populares-->
-                                    <div class="container">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="d-flex align-items-center gap-3 mt-3">
-                                                    <!-- Imagem da capa -->
-                                                    <img src="" class="avatar img-fluid rounded-5" alt="Capa de livro">
 
-                                                    <!-- Spans empilhados verticalmente -->
-                                                    <div class="d-flex flex-column">
-                                                        <span class="fw-bold fs-6 text-dark">Harry potter e</span>
-                                                        <span class="fs-6 text-muted">$10</span>
-                                                    </div>
-                                                </div>
-                                            </div>
+        <!-- Main Content -->
+        <main class="main-content flex-grow-1 p-3">
+            <!-- Top Bar with User Profile -->
+            <div class="d-flex justify-content-end align-items-center mb-4 gap-4 px-3">
+                <i class="fa-solid fa-bell icon-notification"></i>
+                <div class="user-profile d-flex align-items-center gap-2 cursor-pointer">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Profile" class="profile-img">
+                    <div class="profile-info d-flex flex-column">
+                        <span class="profile-name fw-bold fs-6">Ana Silva</span>
+                        <span class="profile-role text-muted small">Bibliotecária</span>
+                    </div>
+                    <i class="fas fa-chevron-down text-muted small"></i>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <h1 class="dashboard-title fs-3 fw-bold mb-4 text-dark">Dashboard</h1>
+
+                <!-- Stats Cards -->
+                <!-- Stats Cards -->
+                <div class="row g-3 mb-4">
+                    <!-- Card 1: Empréstimos -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body d-flex align-items-start justify-content-between">
+                                <div class="px-1">
+                                    <h3 class="card-title fs-5 text-muted mb-5">Empréstimos</h3>
+                                    <p class="card-text fs-4 fw-bold m-0">52.003</p>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <i class='bx bx-up-arrow-alt icon-trending-up'></i>
+                                        <p class="fs-6 card-subtitle text-success">+17%</p>
+                                        <p class="fs-6 card-subtitle px-3">Na última semana</p>
+                                    </div>
+                                </div>
+                                <div class="card-icon blue">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Usuários Ativos -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body d-flex align-items-start justify-content-between">
+                                <div class="px-1">
+                                    <h3 class="card-title fs-5 text-muted mb-5">Atrasados</h3>
+                                    <p class="card-text fs-4 fw-bold m-0">568</p>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <i class='bx bx-up-arrow-alt icon-trending-up'></i>
+                                        <p class="fs-6 card-subtitle text-success">+8%</p>
+                                        <p class="fs-6 card-subtitle px-3">Na última semana</p>
+                                    </div>
+                                </div>
+                                <div class="card-icon red">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Empréstimos Recentes -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body d-flex align-items-start justify-content-between">
+                                <div class="px-1">
+                                    <h3 class="card-title fs-5 text-muted mb-5">Vendas</h3>
+                                    <p class="card-text fs-4 fw-bold m-0">324</p>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <i class='bx bx-up-arrow-alt icon-trending-up'></i>
+                                        <p class="fs-6 card-subtitle text-success">+5%</p>
+                                        <p class="fs-6 card-subtitle px-3">Na última semana</p>
+                                    </div>
+                                </div>
+                                <div class="card-icon green">
+                                    <i class="fa-solid fa-wallet"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Atrasados -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body d-flex align-items-start justify-content-between">
+                                <div class="px-1">
+                                    <h3 class="card-title fs-5 text-muted mb-5">Contatos</h3>
+                                    <p class="card-text fs-4 fw-bold m-0">28</p>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <i class='bx bx-down-arrow-alt icon-trending-down'></i>
+                                        <p class="fs-6 card-subtitle text-danger">-2%</p>
+                                        <p class="fs-6 card-subtitle px-3">Na última semana</p>
+                                    </div>
+                                </div>
+                                <div class="card-icon orange">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Gráficos -->
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0">
+                                <h3 class="card-title fs-6 m-0">Empréstimos Mensais</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="loansChart" width="400" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0">
+                                <h3 class="card-title fs-6 m-0">Tipos de Livros</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="booksChart" width="100" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Books and Recent Activities -->
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div
+                                class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+                                <h3 class="card-title fs-6 m-0">Livros Populares</h3>
+                                <a href="#" class="text-primary small text-decoration-none">Ver todos</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center py-2 border-bottom">
+                                    <img src="https://m.media-amazon.com/images/I/71aLultW5EL._AC_UF1000,1000_QL80_.jpg"
+                                        alt="Book Cover" class="book-cover me-3">
+                                    <div class="flex-grow-1">
+                                        <h4 class="fs-6 mb-1">1984</h4>
+                                        <p class="text-muted small mb-1">George Orwell</p>
+                                        <div class="d-flex gap-3">
+                                            <span class="small text-muted"><i class="fas fa-star text-warning"></i>
+                                                4.8</span>
+                                            <span class="small text-muted"><i class="fas fa-book-open"></i> 42x</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center py-2 border-bottom">
+                                    <img src="https://m.media-amazon.com/images/I/71hTq+qHT-L._AC_UF1000,1000_QL80_.jpg"
+                                        alt="Book Cover" class="book-cover me-3">
+                                    <div class="flex-grow-1">
+                                        <h4 class="fs-6 mb-1">O Pequeno Príncipe</h4>
+                                        <p class="text-muted small mb-1">Antoine de Saint-Exupéry</p>
+                                        <div class="d-flex gap-3">
+                                            <span class="small text-muted"><i class="fas fa-star text-warning"></i>
+                                                4.9</span>
+                                            <span class="small text-muted"><i class="fas fa-book-open"></i> 38x</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center py-2 border-bottom">
+                                    <img src="https://m.media-amazon.com/images/I/91SZSW8qSsL._AC_UF1000,1000_QL80_.jpg"
+                                        alt="Book Cover" class="book-cover me-3">
+                                    <div class="flex-grow-1">
+                                        <h4 class="fs-6 mb-1">Dom Quixote</h4>
+                                        <p class="text-muted small mb-1">Miguel de Cervantes</p>
+                                        <div class="d-flex gap-3">
+                                            <span class="small text-muted"><i class="fas fa-star text-warning"></i>
+                                                4.7</span>
+                                            <span class="small text-muted"><i class="fas fa-book-open"></i> 35x</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center py-2">
+                                    <img src="https://m.media-amazon.com/images/I/71X1p4TGlxL._AC_UF1000,1000_QL80_.jpg"
+                                        alt="Book Cover" class="book-cover me-3">
+                                    <div class="flex-grow-1">
+                                        <h4 class="fs-6 mb-1">Orgulho e Preconceito</h4>
+                                        <p class="text-muted small mb-1">Jane Austen</p>
+                                        <div class="d-flex gap-3">
+                                            <span class="small text-muted"><i class="fas fa-star text-warning"></i>
+                                                4.6</span>
+                                            <span class="small text-muted"><i class="fas fa-book-open"></i> 31x</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div
+                                class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+                                <h3 class="card-title fs-6 m-0">Atividades Recentes</h3>
+                                <a href="#" class="text-primary small text-decoration-none">Ver todas</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex py-2 border-bottom">
+                                    <div class="activity-icon me-3">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1 small"><strong>Maria Oliveira</strong> emprestou
+                                            <strong>1984</strong>
+                                        </p>
+                                        <span class="text-muted small">10 minutos atrás</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex py-2 border-bottom">
+                                    <div class="activity-icon me-3">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1 small"><strong>João Silva</strong> devolveu <strong>Dom
+                                                Quixote</strong></p>
+                                        <span class="text-muted small">1 hora atrás</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex py-2 border-bottom">
+                                    <div class="activity-icon me-3">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1 small">Novo usuário cadastrado: <strong>Carlos Mendes</strong>
+                                        </p>
+                                        <span class="text-muted small">3 horas atrás</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex py-2 border-bottom">
+                                    <div class="activity-icon me-3">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1 small"><strong>Ana Beatriz</strong> atrasou a devolução de
+                                            <strong>Orgulho e Preconceito</strong>
+                                        </p>
+                                        <span class="text-muted small">1 dia atrás</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex py-2">
+                                    <div class="activity-icon me-3">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1 small"><strong>Pedro Alves</strong> renovou o empréstimo de
+                                            <strong>O Pequeno Príncipe</strong>
+                                        </p>
+                                        <span class="text-muted small">2 dias atrás</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
-        crossorigin="anonymous"></script>
-    <script src="script/script.js"></script>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript Personalizado -->
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 
 </html>
