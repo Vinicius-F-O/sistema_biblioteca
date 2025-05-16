@@ -23,47 +23,61 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-    // Toggle favorito
-    document.querySelectorAll('.btn-link.text-warning').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const icon = this.querySelector('i');
-            if (icon.classList.contains('far')) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-            }
-        });
+  // Toggle favorito
+  document.querySelectorAll(".btn-link.text-warning").forEach((btn) => {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const icon = this.querySelector("i");
+      if (icon.classList.contains("far")) {
+        icon.classList.remove("far");
+        icon.classList.add("fas");
+      } else {
+        icon.classList.remove("fas");
+        icon.classList.add("far");
+      }
     });
+  });
 
-    // Confirmação para exclusão
-    document.querySelectorAll('.btn-outline-danger').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Tem certeza que deseja excluir este item do estoque?')) {
-                // Lógica para excluir o item
-                const row = this.closest('tr');
-                row.style.opacity = '0';
-                setTimeout(() => {
-                    row.remove();
-                    // Atualizar contagem de itens
-                    updateStockCount();
-                }, 300);
-            }
-        });
+  // Confirmação para exclusão
+  document.querySelectorAll(".btn-outline-danger").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      if (confirm("Tem certeza que deseja excluir este item do estoque?")) {
+        // Lógica para excluir o item
+        const row = this.closest("tr");
+        row.style.opacity = "0";
+        setTimeout(() => {
+          row.remove();
+          // Atualizar contagem de itens
+          updateStockCount();
+        }, 300);
+      }
     });
+  });
 
-    // Função para atualizar contagem de estoque
-    function updateStockCount() {
-        const totalItems = document.querySelectorAll('tbody tr').length;
-        const lowStock = document.querySelectorAll('.badge.bg-warning').length;
-        const outOfStock = document.querySelectorAll('.badge.bg-danger').length;
-        const inStock = document.querySelectorAll('.badge.bg-success').length;
-        
-        // Atualiza os cards (simulação)
-        document.querySelectorAll('.card-text.fs-5')[3].textContent = `${lowStock} itens`;
-        document.querySelectorAll('.card-text.fs-5')[4].textContent = `${outOfStock} itens`;
-        document.querySelectorAll('.card-text.fs-5')[5].textContent = `${inStock} itens`;
-    }
+  // Função para atualizar contagem de estoque
+  function updateStockCount() {
+    const totalItems = document.querySelectorAll("tbody tr").length;
+    const lowStock = document.querySelectorAll(".badge.bg-warning").length;
+    const outOfStock = document.querySelectorAll(".badge.bg-danger").length;
+    const inStock = document.querySelectorAll(".badge.bg-success").length;
+
+    // Atualiza os cards (simulação)
+    document.querySelectorAll(
+      ".card-text.fs-5"
+    )[3].textContent = `${lowStock} itens`;
+    document.querySelectorAll(
+      ".card-text.fs-5"
+    )[4].textContent = `${outOfStock} itens`;
+    document.querySelectorAll(
+      ".card-text.fs-5"
+    )[5].textContent = `${inStock} itens`;
+  }
+
+  /* Validação do formulário
+    document.getElementById('formCadastroLivro').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Aqui você pode adicionar a lógica para salvar o livro
+        alert('Livro cadastrado com sucesso!');
+        bootstrap.Modal.getInstance(document.getElementById('cadastroLivroModal')).hide();
+    });*/
 });

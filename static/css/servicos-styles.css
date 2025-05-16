@@ -1,0 +1,160 @@
+:root {
+  --primary-color: #5a189a;
+  --secondary-color: #9d4edd;
+  --accent-color: #c77dff;
+  --light-purple: #e0aaff;
+  --dark-purple: #3c096c;
+  --text-light: #f8f9fa;
+  --text-dark: #212529;
+  --bg-color: #f5f7fa;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+}
+
+/* Sidebar - Mantido do código anterior */
+.sidebar {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+}
+
+.sidebar-menu li a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu li.active a {
+  background-color: rgba(157, 78, 221, 0.2);
+  border-left: 3px solid var(--accent-color);
+}
+
+/* Main Content */
+.main-content {
+  transition: all 0.3s;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 20px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.user-profile:hover {
+  background-color: #e5e5e5;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Cards e Contêineres */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(92, 26, 155, 0.1);
+  border: none;
+}
+
+.stats-card {
+  border-left: 4px solid var(--secondary-color);
+  transition: transform 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Botões */
+.btn-primary {
+  background: linear-gradient(
+    to right,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  border: none;
+  border-radius: 8px;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(
+    to right,
+    var(--dark-purple),
+    var(--primary-color)
+  );
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Tabela */
+.table thead th {
+  background-color: rgba(157, 78, 221, 0.05);
+  color: var(--primary-color);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.badge-loan {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.badge-sale {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.badge-overdue {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+/* Modal */
+.modal-header {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Formulários */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.2);
+}
+
+.icon-notification {
+  font-size: 1.25rem; /* mais proporcional ao texto fs-6 */
+  color: var(--accent-color);
+  line-height: 1.5rem;
+  display: inline-flex; /* para alinhar corretamente dentro do flex */
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .stats-card {
+    margin-bottom: 1rem;
+  }
+}
