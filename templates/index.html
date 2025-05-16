@@ -46,7 +46,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                    <a href="/usuarios" class="text-white text-decoration-none d-flex align-items-center p-3">
                         <i class="fas fa-users mx-2"></i>
                         <span class="sidebar-text">Usuários</span>
                     </a>
@@ -110,10 +110,10 @@
                             <form id="profileForm">
                                 <!-- Foto do usuário -->
                                 <div class="text-center mb-3">
-                                    <img src="https://ui-avatars.com/api/?name={{current_user.nome}}&background=0D6EFD&color=fff&size=120&rounded=true&bold=true"
+                                    <img src="https://ui-avatars.com/api/?name={{current_user.nome}}&background=7B2CBF&color=fff&size=120&rounded=true&bold=true"
                                         alt="Avatar de {{current_user.nome}}" id="profilePreview"
                                         style="width: 100px; height: 100px; object-fit: cover;"
-                                        class="profile-img rounded-circle border border-2 border-primary">
+                                        class="profile-img rounded-circle border border-0 border-primary">
                                     <br>
                                     <button type="button" class="btn btn-sm btn-outline-primary mt-2"
                                         id="changePhotoBtn">
@@ -150,87 +150,80 @@
                 <h1 class="dashboard-title fs-3 fw-bold mb-4 text-dark">Dashboard</h1>
 
                 <!-- Stats Cards -->
-                <div class="row g-3 mb-4">
-                    <!-- Card 1: Empréstimos -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body d-flex align-items-start justify-content-between">
-                                <div class="px-1">
-                                    <h3 class="card-title fs-5 text-muted mb-5">Empréstimos</h3>
-                                    <p class="card-text fs-4 fw-bold m-0">52.003</p>
-                                    <div class="d-flex justify-content-start align-items-center">
-                                        <i class='bx bx-up-arrow-alt icon-trending-up'></i>
-                                        <p class="fs-6 card-subtitle text-success">+17%</p>
-                                        <p class="fs-6 card-subtitle px-3">Na última semana</p>
-                                    </div>
+                <div class="row mb-2">
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card stats-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Empréstimos Ativos</h6>
+                                    <h3 class="mb-0">24</h3>
                                 </div>
-                                <div class="card-icon blue">
-                                    <i class="fas fa-book"></i>
+                                <div class="bg-purple-soft rounded-circle p-3">
+                                    <i class="fas fa-book-open text-purple"></i>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 2: Usuários Ativos -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body d-flex align-items-start justify-content-between">
-                                <div class="px-1">
-                                    <h3 class="card-title fs-5 text-muted mb-5">Atrasados</h3>
-                                    <p class="card-text fs-4 fw-bold m-0">568</p>
-                                    <div class="d-flex justify-content-start align-items-center">
-                                        <i class='bx bx-up-arrow-alt icon-trending-up'></i>
-                                        <p class="fs-6 card-subtitle text-success">+8%</p>
-                                        <p class="fs-6 card-subtitle px-3">Na última semana</p>
-                                    </div>
-                                </div>
-                                <div class="card-icon red">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 3: Empréstimos Recentes -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body d-flex align-items-start justify-content-between">
-                                <div class="px-1">
-                                    <h3 class="card-title fs-5 text-muted mb-5">Vendas</h3>
-                                    <p class="card-text fs-4 fw-bold m-0">324</p>
-                                    <div class="d-flex justify-content-start align-items-center">
-                                        <i class='bx bx-up-arrow-alt icon-trending-up'></i>
-                                        <p class="fs-6 card-subtitle text-success">+5%</p>
-                                        <p class="fs-6 card-subtitle px-3">Na última semana</p>
-                                    </div>
-                                </div>
-                                <div class="card-icon green">
-                                    <i class="fa-solid fa-wallet"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 4: Atrasados -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body d-flex align-items-start justify-content-between">
-                                <div class="px-1">
-                                    <h3 class="card-title fs-5 text-muted mb-5">Contatos</h3>
-                                    <p class="card-text fs-4 fw-bold m-0">28</p>
-                                    <div class="d-flex justify-content-start align-items-center">
-                                        <i class='bx bx-down-arrow-alt icon-trending-down'></i>
-                                        <p class="fs-6 card-subtitle text-danger">-2%</p>
-                                        <p class="fs-6 card-subtitle px-3">Na última semana</p>
-                                    </div>
-                                </div>
-                                <div class="card-icon orange">
-                                    <i class="fas fa-users"></i>
-                                </div>
+                            <div class="mt-3">
+                                <span class="badge bg-warning">3 atrasados</span>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card stats-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Vendas Hoje</h6>
+                                    <h3 class="mb-0">8</h3>
+                                </div>
+                                <div class="bg-purple-soft rounded-circle p-3">
+                                    <i class="fas fa-shopping-cart text-purple"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge bg-success">R$ 245,50</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card stats-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Devoluções Pendentes</h6>
+                                    <h3 class="mb-0">5</h3>
+                                </div>
+                                <div class="bg-purple-soft rounded-circle p-3">
+                                    <i class="fas fa-undo text-purple"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge bg-info">2 hoje</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card stats-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Receita Mensal</h6>
+                                    <h3 class="mb-0">R$ 1.245</h3>
+                                </div>
+                                <div class="bg-purple-soft rounded-circle p-3">
+                                    <i class="fas fa-chart-line text-purple"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge bg-success">+12%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
                 <!-- Gráficos -->

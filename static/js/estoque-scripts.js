@@ -38,46 +38,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Confirmação para exclusão
-  document.querySelectorAll(".btn-outline-danger").forEach((btn) => {
-    btn.addEventListener("click", function () {
-      if (confirm("Tem certeza que deseja excluir este item do estoque?")) {
-        // Lógica para excluir o item
-        const row = this.closest("tr");
-        row.style.opacity = "0";
-        setTimeout(() => {
-          row.remove();
-          // Atualizar contagem de itens
-          updateStockCount();
-        }, 300);
+    const imgCapaInput = document.getElementById("imgCapa");
+    const previewCapa = document.createElement("img");
+    previewCapa.id = "previewCapa";
+    imgCapaInput.parentNode.appendChild(previewCapa);
+
+    imgCapaInput.addEventListener("input", function () {
+      if (this.value) {
+        previewCapa.src = this.value;
+        previewCapa.style.display = "block";
+      } else {
+        previewCapa.style.display = "none";
       }
     });
-  });
-
-  // Função para atualizar contagem de estoque
-  function updateStockCount() {
-    const totalItems = document.querySelectorAll("tbody tr").length;
-    const lowStock = document.querySelectorAll(".badge.bg-warning").length;
-    const outOfStock = document.querySelectorAll(".badge.bg-danger").length;
-    const inStock = document.querySelectorAll(".badge.bg-success").length;
-
-    // Atualiza os cards (simulação)
-    document.querySelectorAll(
-      ".card-text.fs-5"
-    )[3].textContent = `${lowStock} itens`;
-    document.querySelectorAll(
-      ".card-text.fs-5"
-    )[4].textContent = `${outOfStock} itens`;
-    document.querySelectorAll(
-      ".card-text.fs-5"
-    )[5].textContent = `${inStock} itens`;
-  }
-
-  /* Validação do formulário
-    document.getElementById('formCadastroLivro').addEventListener('submit', function(e) {
-        e.preventDefault();
-        // Aqui você pode adicionar a lógica para salvar o livro
-        alert('Livro cadastrado com sucesso!');
-        bootstrap.Modal.getInstance(document.getElementById('cadastroLivroModal')).hide();
-    });*/
 });
+
+function confirmarExclusao(id) {
+  if (confirm("Tem certeza que deseja excluir este livro?")) {
+    fetch(`/deletar-livro/${id}`, {
+      method: "DELETE",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          const linha = document.getElementById(`linha-livro-${id}`);
+          if (linha) linha.remove();
+        } else {
+          alert("Erro ao excluir o livro.");
+        }
+      })
+      .catch((error) => {
+        console.error("Erro:", error);
+        alert("Erro ao excluir o livro.");
+      });
+  }
+}

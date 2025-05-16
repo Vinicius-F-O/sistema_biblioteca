@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from db import db
-from models import Funcionario, Livro
+from models import Funcionario, Livro, Cliente, Servico
 from datetime import datetime
 import hashlib
 
@@ -122,10 +122,61 @@ def estoque():
         db.session.add(novoLivro)
         db.session.commit()
         return redirect(url_for('estoque'))
+    
 
-@app.route('/servicos')
+@app.route('/deletar-livro/<int:id>', methods=['DELETE'])
+def deletar_livro(id):
+    livro = Livro.query.get_or_404(id)
+    db.session.delete(livro)
+    db.session.commit()
+    return '', 204  # No content
+
+@app.route('/servicos', methods=['GET', 'POST'])
 def servicos():
-    return render_template("servicos.html")
+    if request.method == 'GET':
+        livros_objs = Livro.query.all()
+
+        livros = [
+            {   
+                "id": l.id,
+                "titulo": l.titulo,
+                "autor": l.autor,
+                "editora": l.editora,
+                "genero": l.genero,
+                "preço": l.preco,
+                "anoPublicacao": l.anoPublicacao
+            }
+                for l in livros_objs
+        ]
+        return render_template("servicos.html", livros=livros)
+    elif request.method == 'POST':
+        print('teste')
+
+
+#Usado apenas pelo Backend
+@app.route('/buscar-cliente', methods=['GET'])
+def buscar_cliente():
+    if request.method == 'GET':
+        cpf = request.args.get("cpf")
+        
+        if not cpf:
+            return jsonify({"found": False})
+
+        cliente = Cliente.query.filter_by(cpf=cpf).first()
+
+        if cliente:
+            return jsonify({
+                "found": True,
+                "id": cliente.id,
+                "nome": cliente.nome,
+                "email": cliente.email
+            })
+        else:
+            return jsonify({"found": False})
+
+@app.route('/usuarios')
+def usuarios():
+    return render_template("usuarios.html")
 
 #Criar páginas de erro
 
