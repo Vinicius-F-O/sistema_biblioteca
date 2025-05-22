@@ -177,16 +177,6 @@ h2 span.sidebar-text {
   );
 }
 
-.btn-outline-primary {
-  color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.btn-outline-primary:hover {
-  background-color: var(--primary-color);
-  color: white;
-}
-
 .btnAdicionar {
   background: linear-gradient(to right, #7b2cbf, #5a189a);
   color: white;
@@ -221,6 +211,18 @@ h2 span.sidebar-text {
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.5px;
+  padding: 1rem;
+  border-bottom: none;
+}
+
+.table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-top: 1px solid rgba(157, 78, 221, 0.05);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(157, 78, 221, 0.02);
 }
 
 .badge-loan {
@@ -242,7 +244,6 @@ h2 span.sidebar-text {
 .modal-header {
   background: linear-gradient(135deg, #5a189a 0%, #7b2cbf 100%);
   color: white;
-  border-radius: 12px 12px 0 0;
   border-bottom: none;
   padding: 1.5rem;
 }

@@ -294,7 +294,7 @@ h2 span.sidebar-text {
   margin-bottom: 0;
 }
 
-.users-table .table thead th {
+.table thead th {
   background-color: rgba(157, 78, 221, 0.05);
   color: var(--primary-color);
   text-transform: uppercase;
@@ -366,7 +366,6 @@ h2 span.sidebar-text {
     var(--secondary-color)
   );
   color: white;
-  border-radius: 12px 12px 0 0;
   padding: 1.5rem;
 }
 

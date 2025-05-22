@@ -103,14 +103,14 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-2">Empréstimos Ativos</h6>
-                                    <h3 class="mb-0">24</h3>
+                                    <h3 class="mb-0">{{ stats['emprestimos_ativos'] }}</h3>
                                 </div>
                                 <div class="bg-purple-soft rounded-circle p-3">
                                     <i class="fas fa-book-open text-purple"></i>
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <span class="badge bg-warning">3 atrasados</span>
+                                <span class="badge bg-warning">{{ stats['atrasados'] }} atrasados</span>
                             </div>
                         </div>
                     </div>
@@ -121,14 +121,14 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-2">Vendas Hoje</h6>
-                                    <h3 class="mb-0">8</h3>
+                                    <h3 class="mb-0">{{ stats['vendas_hoje'] }}</h3>
                                 </div>
                                 <div class="bg-purple-soft rounded-circle p-3">
                                     <i class="fas fa-shopping-cart text-purple"></i>
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <span class="badge bg-success">R$ 245,50</span>
+                                <span class="badge bg-success">{{ stats['valor_vendas_hoje'] }}</span>
                             </div>
                         </div>
                     </div>
@@ -139,14 +139,14 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-2">Devoluções Pendentes</h6>
-                                    <h3 class="mb-0">5</h3>
+                                    <h3 class="mb-0">{{ stats['devolucoes_pendentes'] }}</h3>
                                 </div>
                                 <div class="bg-purple-soft rounded-circle p-3">
                                     <i class="fas fa-undo text-purple"></i>
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <span class="badge bg-info">2 hoje</span>
+                                <span class="badge bg-info">{{ stats['devolucoes_hoje'] }} hoje</span>
                             </div>
                         </div>
                     </div>
@@ -157,7 +157,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-2">Receita Mensal</h6>
-                                    <h3 class="mb-0">R$ 1.245</h3>
+                                    <h3 class="mb-0">{{ stats['receita_mensal'] }}</h3>
                                 </div>
                                 <div class="bg-purple-soft rounded-circle p-3">
                                     <i class="fas fa-chart-line text-purple"></i>
@@ -219,132 +219,69 @@
                                     <th>Cliente</th>
                                     <th>Tipo</th>
                                     <th>Data</th>
+                                    <th>Data Prev. Devolução</th>
                                     <th>Status</th>
-                                    <th>Valor</th>
                                     <th width="120">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for servico in servicos %}
                                 <tr>
-                                    <td>#1001</td>
+                                    <td>#{{ servico.id }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="https://m.media-amazon.com/images/I/51xwGSNX-EL._SY425_.jpg"
+                                            <img src="{{ servico.livro.imgCapa or 'https://via.placeholder.com/40x60' }}"
                                                 alt="Capa do Livro" class="me-2 rounded"
                                                 style="width: 40px; height: auto;">
-                                            <span>O Senhor dos Anéis</span>
+                                            <span>{{ servico.livro.titulo }}</span>
                                         </div>
                                     </td>
-                                    <td>Maria Silva</td>
-                                    <td><span class="badge badge-loan">Empréstimo</span></td>
-                                    <td>15/05/2023</td>
-                                    <td><span class="badge bg-warning">Atrasado</span></td>
-                                    <td>R$ 15,00</td>
+                                    <td>{{ servico.cliente.nome }}</td>
+                                    <td>
+                                        {% if servico.categoriaServico == 'Empréstimo' %}
+                                        <span class="badge badge-loan">Empréstimo</span>
+                                        {% else %}
+                                        <span class="badge badge-sale bg-info">Venda</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ servico.dataServico.strftime('%d/%m/%Y') }}</td>
+                                    <td>{% if servico.dataPrevistaDevolucao %}{{
+                                        servico.dataPrevistaDevolucao.strftime('%d/%m/%Y') }}{% else %}-{% endif %}</td>
+                                    <td>
+                                        {% if servico.statusServico == 'Atrasado' %}
+                                        <span class="badge bg-warning">Atrasado</span>
+                                        {% elif servico.statusServico == 'Ativo' %}
+                                        <span class="badge bg-primary">Ativo</span>
+                                        {% elif servico.statusServico == 'Concluído' %}
+                                        <span class="badge bg-success">Concluído</span>
+                                        {% elif servico.statusServico == 'Renovado' %}
+                                        <span class="badge bg-info">Renovado</span>
+                                        {% elif servico.statusServico == 'Cancelado' %}
+                                        <span class="badge bg-secondary">Cancelado</span>
+                                        {% elif servico.statusServico == 'Multa pendente' %}
+                                        <span class="badge bg-danger">Multa pendente</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ servico.statusServico }}</span>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-primary" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </button>
+                                        {% if servico.categoriaServico == 'Empréstimo' and servico.statusServico ==
+                                        'Ativo' %}
+                                        <button class="btn btn-sm btn-outline-success btn-devolver" title="Devolver"
+                                            data-id="{{ servico.id }}" data-titulo="{{ servico.livro.titulo }}">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        {% else %}
                                         <button class="btn btn-sm btn-outline-danger" title="Cancelar">
                                             <i class="fas fa-times"></i>
                                         </button>
+                                        {% endif %}
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>#1002</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://m.media-amazon.com/images/I/91SZSWXqJ5L._SY425_.jpg"
-                                                alt="Capa do Livro" class="me-2 rounded"
-                                                style="width: 40px; height: auto;">
-                                            <span>Harry Potter e a Pedra Filosofal</span>
-                                        </div>
-                                    </td>
-                                    <td>João Oliveira</td>
-                                    <td><span class="badge badge-sale">Venda</span></td>
-                                    <td>18/05/2023</td>
-                                    <td><span class="badge bg-success">Concluído</span></td>
-                                    <td>R$ 45,90</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-secondary" title="Detalhes">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#1003</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://m.media-amazon.com/images/I/81dQwQlmAXL._SY425_.jpg"
-                                                alt="Capa do Livro" class="me-2 rounded"
-                                                style="width: 40px; height: auto;">
-                                            <span>1984</span>
-                                        </div>
-                                    </td>
-                                    <td>Ana Paula</td>
-                                    <td><span class="badge badge-loan">Empréstimo</span></td>
-                                    <td>20/05/2023</td>
-                                    <td><span class="badge bg-primary">Ativo</span></td>
-                                    <td>R$ 10,00</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-success" title="Devolver">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#1004</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://m.media-amazon.com/images/I/71kxa1-0mfL._SY425_.jpg"
-                                                alt="Capa do Livro" class="me-2 rounded"
-                                                style="width: 40px; height: auto;">
-                                            <span>O Pequeno Príncipe</span>
-                                        </div>
-                                    </td>
-                                    <td>Carlos Eduardo</td>
-                                    <td><span class="badge badge-sale">Venda</span></td>
-                                    <td>22/05/2023</td>
-                                    <td><span class="badge bg-success">Concluído</span></td>
-                                    <td>R$ 29,90</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-secondary" title="Detalhes">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#1005</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://m.media-amazon.com/images/I/71X1p4TGlxL._SY425_.jpg"
-                                                alt="Capa do Livro" class="me-2 rounded"
-                                                style="width: 40px; height: auto;">
-                                            <span>Dom Quixote</span>
-                                        </div>
-                                    </td>
-                                    <td>Fernanda Costa</td>
-                                    <td><span class="badge badge-loan">Empréstimo</span></td>
-                                    <td>25/05/2023</td>
-                                    <td><span class="badge bg-primary">Ativo</span></td>
-                                    <td>R$ 12,00</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-success" title="Devolver">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -369,7 +306,7 @@
                 </div>
             </div>
 
-            <!-- New Transaction Modal -->
+            <!-- Modal de adição de serviço -->
             <div class="modal fade" id="newTransactionModal" tabindex="-1" aria-labelledby="newTransactionModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -381,19 +318,19 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form>
+                            <form id="formServico" action="/servicos" method="POST">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label class="form-label">Tipo de Serviço *</label>
                                             <div class="btn-group w-100" role="group">
                                                 <input type="radio" class="btn-check" name="serviceType" id="loan"
-                                                    autocomplete="off" checked>
+                                                    autocomplete="off" value="Empréstimo" checked>
                                                 <label class="btn btn-outline-primary" for="loan">
                                                     <i class="fas fa-book-open me-2"></i> Empréstimo
                                                 </label>
                                                 <input type="radio" class="btn-check" name="serviceType" id="sale"
-                                                    autocomplete="off">
+                                                    autocomplete="off" value="Venda">
                                                 <label class="btn btn-outline-primary" for="sale">
                                                     <i class="fas fa-shopping-cart me-2"></i> Venda
                                                 </label>
@@ -407,18 +344,18 @@
                                         <div id="clienteInfo" class="mt-2 text-muted"></div>
                                         <div class="mb-3">
                                             <label for="userSelect" class="form-label">Funcionário *</label>
-                                            <select class="form-select" id="userSelect" required>
-                                                <option selected disabled>Selecione um usuário</option>
-                                                <option>Maria Silva</option>
-                                                <option>João Oliveira</option>
-                                                <option>Ana Paula</option>
+                                            <select class="form-select" id="userSelect" name="funcionarioForm" required>
+                                                <option selected disabled>Selecione um funcionário</option>
+                                                {% for funcionario in funcionarios %}
+                                                <option value="{{ funcionario.id }}">{{ funcionario.nome }}</option>
+                                                {% endfor %}
                                             </select>
                                         </div>
                                         <div class="mb-3 position-relative">
                                             <label for="bookSearch" class="form-label">Livro *</label>
                                             <input type="text" class="form-control" id="bookSearch"
-                                                placeholder="Digite o nome, autor, ID ou editora" autocomplete="off"
-                                                required>
+                                                placeholder="Digite o nome, autor, ID ou editora" name="livroForm"
+                                                autocomplete="off" required>
                                             <ul id="suggestions" class="dropdown-menu show"
                                                 style="width: 100%; display: none;"></ul>
                                         </div>
@@ -426,31 +363,59 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="transactionDate" class="form-label">Data *</label>
-                                            <input type="date" class="form-control" id="transactionDate" required>
+                                            <input type="date" class="form-control" id="transactionDate" name="dataForm"
+                                                required>
                                         </div>
                                         <div class="mb-3">
                                             <label for="dueDate" class="form-label">Data de Devolução</label>
-                                            <input type="date" class="form-control" id="dueDate">
+                                            <input type="date" class="form-control" id="dueDate"
+                                                name="dataDevolucaoForm">
                                         </div>
                                         <div class="mb-3">
                                             <label for="transactionValue" class="form-label">Valor *</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">R$</span>
                                                 <input type="number" class="form-control" id="transactionValue"
-                                                    step="0.01" min="0" required>
+                                                    name="valorForm" step="0.01" min="0" required>
                                             </div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="transactionNotes" class="form-label">Observações</label>
-                                            <textarea class="form-control" id="transactionNotes" rows="2"></textarea>
+                                            <textarea class="form-control" id="transactionNotes" rows="2"
+                                                name="observacaoForm"></textarea>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary btnCancelarModal" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-primary btnAdicionar">Registrar Serviço</button>
+                            <button type="button" class="btn btn-outline-secondary btnCancelarModal"
+                                data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" form="formServico" class="btn btn-primary btnAdicionar">Registrar
+                                Serviço</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de devolução de serviço -->
+            <div class="modal fade" id="modalDevolucao" tabindex="-1" role="dialog"
+                aria-labelledby="modalDevolucaoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalDevolucaoLabel">Devolução de Serviço</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="infoDevolucao"></div>
+                            <p>Deseja realmente registrar a devolução deste serviço?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-success" id="btnConfirmarDevolucao">Confirmar
+                                Devolução</button>
                         </div>
                     </div>
                 </div>

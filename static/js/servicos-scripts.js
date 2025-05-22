@@ -1,6 +1,45 @@
-// Toggle sidebar
-document.getElementById("toggle-btn").addEventListener("click", function () {
-  document.getElementById("sidebar").classList.toggle("collapsed");
+document.addEventListener("DOMContentLoaded", function () {
+  // Toggle Sidebar
+  const toggleBtn = document.getElementById("toggle-btn");
+  const sidebar = document.getElementById("sidebar");
+
+  toggleBtn.addEventListener("click", function () {
+    sidebar.classList.toggle("collapsed");
+
+    const icon = document.getElementById("sidebar-toggle-icon");
+
+    // Alterna o ícone entre 'fa-bars' e 'fa-chevron-right'
+    if (sidebar.classList.contains("collapsed")) {
+      icon.classList.remove("fa-bars");
+      icon.classList.add("fa-chevron-right");
+    } else {
+      icon.classList.remove("fa-chevron-right");
+      icon.classList.add("fa-bars");
+    }
+
+    // Em mobile, alternar a classe 'active'
+    if (window.innerWidth <= 768) {
+      sidebar.classList.toggle("active");
+    }
+  });
+
+  // Fechar sidebar quando clicar fora (em mobile)
+  document.addEventListener("click", function (e) {
+    if (
+      window.innerWidth <= 768 &&
+      !sidebar.contains(e.target) &&
+      e.target !== toggleBtn
+    ) {
+      sidebar.classList.remove("active");
+    }
+  });
+
+  // Atualizar layout quando a janela for redimensionada
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 768) {
+      sidebar.classList.remove("active");
+    }
+  });
 });
 
 // Dynamic due date for loans
@@ -57,7 +96,7 @@ input.addEventListener("input", function () {
     li.classList.add("dropdown-item");
     li.textContent = `${book.titulo} - ${book.autor}`;
     li.addEventListener("click", () => {
-      input.value = `${book.titulo} - ${book.autor}`;
+      input.value = book.titulo;
       suggestionBox.innerHTML = "";
       suggestionBox.style.display = "none";
     });
@@ -78,6 +117,30 @@ document.addEventListener("click", (e) => {
 const inputCPF = document.getElementById("clienteSelect");
 const clienteInfoDiv = document.getElementById("clienteInfo");
 
+// Máscara de CPF
+inputCPF.addEventListener("input", function (e) {
+  let value = e.target.value.replace(/\D/g, "");
+  if (value.length > 3) value = value.replace(/^(\d{3})/, "$1.");
+  if (value.length > 7) value = value.replace(/^(\d{3})\.(\d{3})/, "$1.$2.");
+  if (value.length > 11)
+    value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})/, "$1.$2.$3-");
+  e.target.value = value.substring(0, 14);
+});
+
+const form = document.getElementById("formServico"); // Substitua pelo ID real do seu <form>
+
+form.addEventListener("submit", function (e) {
+  const cpfInput = document.getElementById("clienteSelect");
+  cpfInput.value = cpfInput.value.replace(/\D/g, ""); // Remove todos os caracteres não numéricos
+  // Bloqueia envio se o botão estiver desabilitado
+  if (document.querySelector(".btnAdicionar").disabled) {
+    e.preventDefault();
+    alert(
+      "O cliente possui multas pendentes e não pode realizar novos serviços."
+    );
+  }
+});
+
 inputCPF.addEventListener("input", () => {
   const cpf = inputCPF.value.replace(/\D/g, ""); // Remove não dígitos
 
@@ -86,20 +149,98 @@ inputCPF.addEventListener("input", () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.found) {
-          clienteInfoDiv.innerHTML = `
-              <strong>Nome:</strong> ${data.nome}<br>
-              <strong>ID:</strong> ${data.id}<br>
-              <strong>Email:</strong> ${data.email}
+          let multaInfo = "";
+          let avisoMulta = "";
+
+          if (data.multas_pendentes && data.multas_pendentes > 0) {
+            multaInfo = `
+              <span class="small text-danger mt-1">
+                <i class="fas fa-exclamation-triangle me-1"></i>
+                Multa pendente: R$ ${data.multa.toFixed(2)}
+              </span>
             `;
+            avisoMulta = `
+              <span class="text-danger d-block mt-2 fs-6">
+                Este cliente possui multas pendentes e não pode realizar novos serviços.
+              </span>
+            `;
+          }
+
+          clienteInfoDiv.innerHTML = `
+            <div class="card border-primary mb-2" style="max-width: 350px;">
+              <div class="card-body py-2 px-3">
+                <div class="d-flex flex-column">
+                  <span class="fw-bold text-primary mb-1"><i class="fas fa-user me-1"></i> ${data.nome}</span>
+                  <span class="small text-muted mb-1"><i class="fas fa-id-card me-1"></i> ID: ${data.id}</span>
+                  <span class="small text-muted"><i class="fas fa-envelope me-1"></i> ${data.email}</span>
+                  ${multaInfo}
+                </div>
+              </div>
+            </div>
+            ${avisoMulta}
+          `;
+
+          // Habilita ou bloqueia o botão de adicionar
+          document.querySelector(".btnAdicionar").disabled = !!(
+            data.multas_pendentes && data.multas_pendentes > 0
+          );
         } else {
           clienteInfoDiv.innerHTML = `<span class="text-danger">Cliente não encontrado.</span>`;
+          document.querySelector(".btnAdicionar").disabled = true;
         }
       })
       .catch((error) => {
         clienteInfoDiv.innerHTML = `<span class="text-danger">Erro ao buscar cliente.</span>`;
+        document.querySelector(".btnAdicionar").disabled = true;
         console.error(error);
       });
   } else {
     clienteInfoDiv.innerHTML = "";
+    document.querySelector(".btnAdicionar").disabled = false;
   }
 });
+
+let servicoIdSelecionado = null;
+
+document.querySelectorAll(".btn-devolver").forEach((btn) => {
+  btn.addEventListener("click", function () {
+    servicoIdSelecionado = this.getAttribute("data-id");
+    // Exibir informações do serviço no modal (opcional)
+    const tituloLivro = this.getAttribute("data-titulo");
+    document.getElementById(
+      "infoDevolucao"
+    ).innerHTML = `<strong>Livro:</strong> ${tituloLivro}`;
+    // Abrir o modal
+    const modal = new bootstrap.Modal(
+      document.getElementById("modalDevolucao")
+    );
+    modal.show();
+  });
+});
+
+document
+  .getElementById("btnConfirmarDevolucao")
+  .addEventListener("click", function () {
+    if (servicoIdSelecionado) {
+      fetch(`/devolver-servico/${servicoIdSelecionado}`, {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Fecha o modal
+            const modal = bootstrap.Modal.getInstance(
+              document.getElementById("modalDevolucao")
+            );
+            modal.hide();
+            // Recarrega a página para atualizar a tabela
+            location.reload();
+          } else {
+            alert("Erro ao devolver serviço.");
+          }
+        });
+    }
+  });

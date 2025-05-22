@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estoque - Sistema de Biblioteca</title>
+    <title>Estoque | Codex</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -211,7 +211,7 @@
                                                 <select class="form-select" id="tipoServico"
                                                     aria-label="Selecionar tipo de serviço" name="tipoServicoForm"
                                                     required>
-                                                    <option selected disabled>Selecione a disponibilidade</option>
+                                                    <option selected disabled>Selecione os serviços</option>
                                                     <option value="1">Apenas empréstimo</option>
                                                     <option value="2">Apenas venda</option>
                                                     <option value="3">Qualquer serviço</option>
@@ -275,10 +275,12 @@
                                 </form>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                <button type="button" class="btn btn-outline-secondary btnCancelarModal"
+                                    data-bs-dismiss="modal">
                                     <i class="fas fa-times me-1"></i> Cancelar
                                 </button>
-                                <button type="submit" form="formCadastroLivro" class="btn btn-primary">
+                                <button type="submit" form="formCadastroLivro"
+                                    class="btn btn-primary btn-adicionar border-0">
                                     <i class="fas fa-save me-1"></i> Salvar Livro
                                 </button>
                             </div>
@@ -380,8 +382,9 @@
                                         <td>R$ {{ "%.2f"|format(livro.preco|float) }}</td>
                                         <td>
                                             <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox"
-                                                    id="catalogo{{ livro.id }}" checked>
+                                                <input class="form-check-input disponibilidade-switch" type="checkbox"
+                                                    id="catalogo{{ livro.id }}" data-id="{{ livro.id }}" {% if
+                                                    livro.disponibilidade %} checked {% endif %}>
                                                 <label class="form-check-label" for="catalogo{{ livro.id }}"></label>
                                             </div>
                                         </td>
@@ -389,7 +392,8 @@
                                             <button type="button" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmarExclusao({{ livro.id }})">
+                                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                                onclick="confirmarExclusao({{ livro.id }})">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
@@ -421,11 +425,95 @@
             </div>
         </main>
     </div>
+    <!-- Modal de Edição de Livro -->
+    <div class="modal fade" id="editarLivroModal" tabindex="-1" aria-labelledby="editarLivroModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarLivroModalLabel">
+                        <i class="fas fa-edit me-2"></i> Editar Livro
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarLivro">
+                        <input type="hidden" id="editLivroId">
+                        <div class="row">
+                            <!-- Coluna Esquerda -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editTituloLivro" class="form-label">Título do Livro *</label>
+                                    <input type="text" class="form-control" id="editTituloLivro" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editAutorLivro" class="form-label">Autor(es) *</label>
+                                    <input type="text" class="form-control" id="editAutorLivro" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editEditoraLivro" class="form-label">Editora *</label>
+                                    <input type="text" class="form-control" id="editEditoraLivro" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editAnoPublicacao" class="form-label">Ano de Publicação *</label>
+                                    <input type="number" class="form-control" id="editAnoPublicacao" min="1900"
+                                        max="2099" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editGeneroLivro" class="form-label">Gênero *</label>
+                                    <input type="text" class="form-control" id="editGeneroLivro" required>
+                                </div>
+                            </div>
+
+                            <!-- Coluna Direita -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editPrecoLivro" class="form-label">Preço (R$) *</label>
+                                    <input type="number" class="form-control" id="editPrecoLivro" step="0.01" min="0"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editNotaLivro" class="form-label">Nota (0-5)</label>
+                                    <select class="form-select" id="editNotaLivro">
+                                        <option value="">Selecione uma nota</option>
+                                        <option value="1">1 ★</option>
+                                        <option value="2">2 ★★</option>
+                                        <option value="3">3 ★★★</option>
+                                        <option value="4">4 ★★★★</option>
+                                        <option value="5">5 ★★★★★</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editQtdEstoque" class="form-label">Quantidade em Estoque *</label>
+                                    <input type="number" class="form-control" id="editQtdEstoque" min="0" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editImgCapa" class="form-label">URL da Capa</label>
+                                    <input type="url" class="form-control" id="editImgCapa">
+                                    <small class="text-muted">Cole a URL de uma imagem da capa do livro</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer pt-3 p-0">
+                            <button type="button" class="btn btn-outline-secondary btnCancelarModal"
+                                data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i> Cancelar
+                            </button>
+                            <button type="submit" form="formEditarLivro" class="btn btn-primary btn-adicionar border-0">
+                                <i class="fas fa-save me-1"></i> Editar Livro
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- JavaScript Personalizado -->
     <script src="{{ url_for('static', filename='js/estoque-scripts.js') }}"></script>
+
 </body>
 
 </html>

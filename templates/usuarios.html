@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estoque - Sistema de Biblioteca</title>
+    <title>Usuários | Codex</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -192,8 +192,8 @@
                     </ul>
 
                     <div class="pb-2">
-                        <button id="addUserBtn" class="btn btn-primary btn-adicionarUsuario border-0" data-bs-toggle="modal"
-                            data-bs-target="#newUserModal">
+                        <button id="addUserBtn" class="btn btn-primary btn-adicionarUsuario border-0"
+                            data-bs-toggle="modal" data-bs-target="#newUserModal">
                             <i class="fas fa-plus me-2"></i> Adicionar Cliente
                         </button>
                     </div>
@@ -235,7 +235,7 @@
                     </div>
 
                     <!-- Clients Table -->
-                    <div class="card">
+                    <div class="card users-table border-0">
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-hover mb-0">
@@ -251,45 +251,67 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>#1001</td>
+                                        {% for cliente in clientes %}
+                                        <tr data-id="{{ cliente.id }}">
+                                            <td>#{{ loop.index }}</td>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <img src="https://ui-avatars.com/api/?name=Maria+Silva&background=7B2CBF&color=fff&size=40&rounded=true"
-                                                        alt="Maria Silva" class="me-2 rounded-circle">
-                                                    <div>
-                                                        <div class="fw-bold">Maria Silva</div>
-                                                        <small class="text-muted">maria@email.com</small>
+                                                    <img src="https://ui-avatars.com/api/?name={{ cliente.nome|replace(' ', '+') }}&background=7B2CBF&color=fff&size=40&rounded=true"
+                                                        alt="{{ cliente.nome }}"
+                                                        class="me-2 rounded-circle user-avatar">
+                                                    <div class="user-info">
+                                                        <div class="user-name">{{ cliente.nome }}</div>
+                                                        <div class="user-email">{{ cliente.email }}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>123.456.789-00</td>
-                                            <td>(11) 98765-4321</td>
-                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>{{ cliente.cpf }}</td>
+                                            <td>{{ cliente.telefone }}</td>
                                             <td>
-                                                <span class="badge bg-primary">2 ativos</span>
-                                                <span class="badge bg-danger ms-1">1 multa</span>
+                                                {% if cliente.statusCliente == 'Ativo' %}
+                                                <span class="badge bg-success">Ativo</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">Inativo</span>
+                                                {% endif %}
                                             </td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary" title="Editar">
+                                                <span class="badge bg-primary" title="Empréstimos ativos">
+                                                    <i class="fas fa-book"></i> {{ cliente.emprestimos_ativos }}
+                                                </span>
+                                                <span class="badge bg-danger" title="Multas pendentes">
+                                                    <i class="fas fa-exclamation-triangle"></i> {{
+                                                    cliente.multas_pendentes }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" title="Editar"
+                                                    data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
+                                                    data-id="{{ cliente.id }}">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button class="btn btn-sm btn-outline-info" title="Detalhes">
+                                                <button class="btn btn-sm btn-outline-info btn-detalhes"
+                                                    title="Detalhes" data-bs-toggle="modal"
+                                                    data-bs-target="#modalDetalhesCliente" data-cpf="{{cliente.cpf}}"">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
-                                                <button class="btn btn-sm btn-outline-danger" title="Desativar">
-                                                    <i class="fas fa-user-slash"></i>
+                                                <button
+                                                    class="btn btn-sm {% if cliente.statusCliente == 'Ativo' %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
+                                                    title="{% if cliente.statusCliente == 'Ativo' %}Desativar{% else %}Ativar{% endif %}"
+                                                    data-bs-toggle="modal" data-bs-target="#modalStatusCliente"
+                                                    data-id="{{ cliente.id }}">
+                                                    <i
+                                                        class="fas {% if cliente.statusCliente == 'Ativo' %}fa-user-slash{% else %}fa-user-check{% endif %}"></i>
                                                 </button>
                                             </td>
                                         </tr>
-                                        <!-- More client rows... -->
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
                             <div class="text-muted small">
-                                Mostrando 1 a 10 de 142 clientes
+                                Mostrando 1 a 10 de {{ clientes|length }} clientes
                             </div>
                             <nav>
                                 <ul class="pagination pagination-sm mb-0">
@@ -306,6 +328,7 @@
                             </nav>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- Staff Tab -->
@@ -341,7 +364,7 @@
                     </div>
 
                     <!-- Staff Table -->
-                    <div class="card">
+                    <div class="card users-table border-0">
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-hover mb-0">
@@ -357,42 +380,62 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>#2001</td>
+                                        {% for funcionario in funcionarios %}
+                                        <tr data-id="{{ funcionario.id }}">
+                                            <td>#{{ loop.index }}</td>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <img src="https://ui-avatars.com/api/?name=João+Oliveira&background=7B2CBF&color=fff&size=40&rounded=true"
-                                                        alt="João Oliveira" class="me-2 rounded-circle">
-                                                    <div>
-                                                        <div class="fw-bold">João Oliveira</div>
-                                                        <small class="text-muted">joao@biblioteca.com</small>
+                                                    <img src="https://ui-avatars.com/api/?name={{ funcionario.nome|replace(' ', '+') }}&background=7B2CBF&color=fff&size=40&rounded=true"
+                                                        alt="{{ funcionario.nome }}"
+                                                        class="me-2 rounded-circle user-avatar">
+                                                    <div class="user-info">
+                                                        <div class="user-name">{{ funcionario.nome }}</div>
+                                                        <div class="user-email">{{ funcionario.email }}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>Bibliotecário</td>
-                                            <td>MAT-001</td>
-                                            <td><span class="badge bg-success">Ativo</span></td>
-                                            <td>Hoje, 09:42</td>
+                                            <td>{{ funcionario.cargo }}</td>
+                                            <td>{{ funcionario.matricula }}</td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary" title="Editar">
+                                                {% if funcionario.statusFuncionario == 'Ativo' %}
+                                                <span class="badge bg-success">Ativo</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">Inativo</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ funcionario.ultimo_acesso.strftime('%d/%m/%Y %H:%M') if
+                                                funcionario.ultimo_acesso else 'Nunca' }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-editar-funcionario"
+                                                    title="Editar" data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditarFuncionario"
+                                                    data-id="{{ funcionario.id }}">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button class="btn btn-sm btn-outline-info" title="Permissões">
+                                                <button class="btn btn-sm btn-outline-info btn-permissoes"
+                                                    title="Permissões" data-bs-toggle="modal"
+                                                    data-bs-target="#modalPermissoesFuncionario"
+                                                    data-id="{{ funcionario.id }}">
                                                     <i class="fas fa-key"></i>
                                                 </button>
-                                                <button class="btn btn-sm btn-outline-danger" title="Desativar">
-                                                    <i class="fas fa-user-slash"></i>
+                                                <button
+                                                    class="btn btn-sm {% if funcionario.statusFuncionario == 'Ativo' %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
+                                                    title="{% if funcionario.statusFuncionario == 'Ativo' %}Desativar{% else %}Ativar{% endif %}"
+                                                    data-bs-toggle="modal" data-bs-target="#modalDesativarFuncionario"
+                                                    data-id="{{ funcionario.id }}">
+                                                    <i
+                                                        class="fas {% if funcionario.statusFuncionario == 'Ativo' %}fa-user-slash{% else %}fa-user-check{% endif %}"></i>
                                                 </button>
                                             </td>
                                         </tr>
-                                        <!-- More staff rows... -->
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
                             <div class="text-muted small">
-                                Mostrando 1 a 5 de 8 funcionários
+                                Mostrando 1 a 10 de {{ funcionarios|length }} funcionários
                             </div>
                             <nav>
                                 <ul class="pagination pagination-sm mb-0">
@@ -411,7 +454,7 @@
                 </div>
             </div>
 
-            <!-- New User Modal -->
+            <!-- Modal de novo usuário -->
             <div class="modal fade" id="newUserModal" tabindex="-1" aria-labelledby="newUserModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered user-modal">
@@ -441,56 +484,58 @@
                             <div class="tab-content" id="userTypeTabsContent">
                                 <!-- New Client Form -->
                                 <div class="tab-pane fade show active" id="newClient" role="tabpanel">
-                                    <form id="newClientForm">
+                                    <form id="newClientForm" method="POST" action="/usuarios">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="clientName" class="form-label">Nome Completo *</label>
-                                                    <input type="text" class="form-control" id="clientName" required>
+                                                    <input type="text" class="form-control" id="clientName"
+                                                        name="nomeClienteForm" required>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="clientCpf" class="form-label">CPF *</label>
                                                     <input type="text" class="form-control" id="clientCpf"
-                                                        placeholder="000.000.000-00" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="clientBirthdate" class="form-label">Data de
-                                                        Nascimento</label>
-                                                    <input type="date" class="form-control" id="clientBirthdate">
+                                                        placeholder="000.000.000-00" name="cpfClienteForm" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="clientEmail" class="form-label">Email *</label>
-                                                    <input type="email" class="form-control" id="clientEmail" required>
+                                                    <input type="email" class="form-control" id="clientEmail"
+                                                        name="emailClienteForm" required>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="clientPhone" class="form-label">Telefone *</label>
                                                     <input type="tel" class="form-control" id="clientPhone"
-                                                        placeholder="(00) 00000-0000" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="clientAddress" class="form-label">Endereço</label>
-                                                    <input type="text" class="form-control" id="clientAddress">
+                                                        placeholder="(00) 00000-0000" name="telefoneClienteForm"
+                                                        required>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary btnCancelarModal"
+                                                data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-primary btn-adicionarUsuario border-0"
+                                                id="saveUserBtnClient">Salvar Usuário</button>
                                         </div>
                                     </form>
                                 </div>
 
                                 <!-- New Staff Form -->
                                 <div class="tab-pane fade" id="newStaff" role="tabpanel">
-                                    <form id="newStaffForm">
+                                    <form id="newStaffForm" method="POST" action="/usuarios">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="staffName" class="form-label">Nome Completo *</label>
-                                                    <input type="text" class="form-control" id="staffName" required>
+                                                    <input type="text" class="form-control" id="staffName"
+                                                        name="nomeStaffForm" required>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="staffRole" class="form-label">Cargo *</label>
-                                                    <select class="form-select" id="staffRole" required>
-                                                        <option value="">Selecione um cargo</option>
+                                                    <select class="form-select" id="staffRole" name="cargoStaffForm"
+                                                        aria-label="Selecionar cargo" required>
+                                                        <option selected disabled>Selecione um cargo</option>
                                                         <option>Bibliotecário</option>
                                                         <option>Atendente</option>
                                                         <option>Administrador</option>
@@ -501,21 +546,28 @@
                                                     <label for="staffRegistration" class="form-label">Matrícula
                                                         *</label>
                                                     <input type="text" class="form-control" id="staffRegistration"
-                                                        required>
+                                                        name="matriculaStaffForm" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="clientBirthdate" class="form-label">Data de
+                                                        Contratação</label>
+                                                    <input type="date" class="form-control" id="staffBirthdate"
+                                                        name="dataContratacaoForm">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="staffEmail" class="form-label">Email Institucional
                                                         *</label>
-                                                    <input type="email" class="form-control" id="staffEmail" required>
+                                                    <input type="email" class="form-control" id="staffEmail"
+                                                        name="emailStaffForm" required>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="staffPassword" class="form-label">Senha Temporária
                                                         *</label>
                                                     <div class="input-group">
                                                         <input type="password" class="form-control" id="staffPassword"
-                                                            required>
+                                                            name="passwordStaffForm" required>
                                                         <button class="btn btn-outline-secondary" type="button"
                                                             id="generatePassword">
                                                             <i class="fas fa-sync-alt"></i> Gerar
@@ -527,31 +579,508 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Permissões de Acesso</label>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="permLoans">
+                                                        <input class="form-check-input" type="checkbox" id="permLoans"
+                                                            name="permissaoGerenciarEmprestimosForm">
                                                         <label class="form-check-label" for="permLoans">Gerenciar
                                                             Empréstimos</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox"
-                                                            id="permInventory">
+                                                            id="permInventory" name="permissaoGerenciarEstoqueForm">
                                                         <label class="form-check-label" for="permInventory">Gerenciar
                                                             Estoque</label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="permUsers">
+                                                        <input class="form-check-input" type="checkbox" id="permUsers"
+                                                            name="permissaoGerenciarUsuariosForm">
                                                         <label class="form-check-label" for="permUsers">Gerenciar
                                                             Usuários</label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary btnCancelarModal"
+                                                data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-primary btn-adicionarUsuario border-0"
+                                                id="saveUserBtnStaff">Salvar Usuário</button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Edição cliente -->
+            <div class="modal fade user-modal" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Editar Cliente</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formEditarCliente" method="POST" action="/editar-cliente/" autocomplete="off">
+                                <input type="hidden" name="clienteId" id="editarClienteId">
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="editarNome" class="form-label">Nome Completo</label>
+                                            <input type="text" class="form-control" id="editarNome" name="nome"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="editarCpf" class="form-label">CPF</label>
+                                            <input type="text" class="form-control" id="editarCpf" name="cpf" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="editarEmail" class="form-label">E-mail</label>
+                                            <input type="email" class="form-control" id="editarEmail" name="email"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="editarTelefone" class="form-label">Telefone</label>
+                                            <input type="tel" class="form-control" id="editarTelefone" name="telefone"
+                                                required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary btnCancelarModal" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-primary btn-adicionarUsuario border-0" id="saveUserBtn">Salvar Usuário</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" form="formEditarCliente" class="btn btn-primary">Salvar
+                                Alterações</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Detalhes Cliente -->
+            <div class="modal fade user-modal" id="modalDetalhesCliente" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fas fa-user me-2"></i>Detalhes do Cliente
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-3 text-center mb-4">
+                                    <img id="detalhesAvatar" src="" class="rounded-circle mb-3" width="120" height="120"
+                                        alt="Avatar">
+                                    <div>
+                                        <span id="detalhesStatus" class="badge"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small mb-1">Nome Completo</label>
+                                                <p id="detalhesNome" class="mb-0 fw-bold"></p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small mb-1">CPF</label>
+                                                <p id="detalhesCpf" class="mb-0"></p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small mb-1">E-mail</label>
+                                                <p id="detalhesEmail" class="mb-0"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small mb-1">Telefone</label>
+                                                <p id="detalhesTelefone" class="mb-0"></p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small mb-1">Endereço</label>
+                                                <p id="detalhesEndereco" class="mb-0"></p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small mb-1">Data de Cadastro</label>
+                                                <p id="detalhesDataCadastro" class="mb-0"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <!-- Seção de Empréstimos Ativos -->
+                            <h6 class="mb-3 fw-bold">
+                                <i class="fas fa-book me-2 text-primary"></i>Empréstimos Ativos
+                                <span class="badge bg-primary ms-2" id="totalEmprestimos">3</span>
+                            </h6>
+
+                            <div class="row g-3 mb-4" id="emprestimosContainer">
+                                <!-- Card de Empréstimo 1 -->
+                                <div class="col-md-6">
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title mb-0 fw-bold">Dom Casmurro</h6>
+                                                <span class="badge bg-warning text-dark">Dia 12/06</span>
+                                            </div>
+                                            <p class="card-text small text-muted mb-2">Machado de Assis</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="badge bg-light text-dark small">
+                                                        <i class="fas fa-calendar-alt me-1"></i> Empréstimo: 05/06/2023
+                                                    </span>
+                                                </div>
+                                                <button class="btn btn-sm btn-outline-primary py-0 px-2">
+                                                    <i class="fas fa-eye"></i> Detalhes
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card de Empréstimo 2 -->
+                                <div class="col-md-6">
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title mb-0 fw-bold">1984</h6>
+                                                <span class="badge bg-danger">Atrasado 3 dias</span>
+                                            </div>
+                                            <p class="card-text small text-muted mb-2">George Orwell</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="badge bg-light text-dark small">
+                                                        <i class="fas fa-calendar-alt me-1"></i> Empréstimo: 20/05/2023
+                                                    </span>
+                                                </div>
+                                                <button class="btn btn-sm btn-outline-primary py-0 px-2">
+                                                    <i class="fas fa-eye"></i> Detalhes
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card de Empréstimo 3 -->
+                                <div class="col-md-6">
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title mb-0 fw-bold">O Senhor dos Anéis</h6>
+                                                <span class="badge bg-success">Dia 20/06</span>
+                                            </div>
+                                            <p class="card-text small text-muted mb-2">J.R.R. Tolkien</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="badge bg-light text-dark small">
+                                                        <i class="fas fa-calendar-alt me-1"></i> Empréstimo: 01/06/2023
+                                                    </span>
+                                                </div>
+                                                <button class="btn btn-sm btn-outline-primary py-0 px-2">
+                                                    <i class="fas fa-eye"></i> Detalhes
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seção de Multas -->
+                            <h6 class="mb-3 fw-bold">
+                                <i class="fas fa-exclamation-triangle me-2 text-danger"></i>Multas Pendentes
+                                <span class="badge bg-danger ms-2" id="totalMultas">2</span>
+                            </h6>
+
+                            <div class="row g-3" id="multasContainer">
+                                <!-- Card de Multa 1 -->
+                                <div class="col-md-6">
+                                    <div class="card border-0 border-start border-3 border-danger shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title mb-0 fw-bold">Atraso na devolução</h6>
+                                                <span class="badge bg-danger">R$ 15,00</span>
+                                            </div>
+                                            <p class="card-text small text-muted mb-2">Livro: 1984</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="badge bg-light text-dark small">
+                                                        <i class="fas fa-calendar-times me-1"></i> Vencimento:
+                                                        10/06/2023
+                                                    </span>
+                                                </div>
+                                                <button class="btn btn-sm btn-outline-danger py-0 px-2">
+                                                    <i class="fas fa-dollar-sign"></i> Pagar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card de Multa 2 -->
+                                <div class="col-md-6">
+                                    <div class="card border-0 border-start border-3 border-warning shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title mb-0 fw-bold">Danificação de obra</h6>
+                                                <span class="badge bg-warning text-dark">R$ 45,00</span>
+                                            </div>
+                                            <p class="card-text small text-muted mb-2">Livro: Dom Casmurro</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="badge bg-light text-dark small">
+                                                        <i class="fas fa-calendar-times me-1"></i> Vencimento:
+                                                        15/06/2023
+                                                    </span>
+                                                </div>
+                                                <button class="btn btn-sm btn-outline-danger py-0 px-2">
+                                                    <i class="fas fa-dollar-sign"></i> Pagar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de alteração de status do cliente -->
+            <div class="modal fade" id="modalStatusCliente" tabindex="-1" aria-labelledby="modalStatusClienteLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <form id="formStatusCliente" method="POST">
+                        <input type="hidden" name="clienteId" id="statusClienteId">
+                        <input type="hidden" name="novoStatus" id="novoStatusCliente">
+                        <div class="modal-content">
+                            <div class="modal-header bg-danger text-white" id="modalStatusClienteHeader">
+                                <h5 class="modal-title" id="modalStatusClienteLabel">
+                                    <i id="iconStatusCliente" class="fas fa-user-slash me-2"></i>Alterar Status do
+                                    Cliente
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="d-flex align-items-center mb-4">
+                                    <img id="statusClienteAvatar" src="" class="rounded-circle me-3" width="60"
+                                        height="60" alt="Avatar">
+                                    <div>
+                                        <h6 id="statusClienteNome" class="mb-0"></h6>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Atenção:</strong> Esta ação irá <span id="acaoStatusCliente"></span>
+                                    possibilidade de serviços futuros do cliente.
+                                </div>
+                                <div id="infoStatusCliente" class="mb-3"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-danger" id="btnConfirmarStatusCliente">
+                                    Confirmar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal Editar Funcionário -->
+            <div class="modal fade user-modal" id="modalEditarFuncionario" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content rounded-3 shadow-sm border-0">
+                        <div class="modal-header bg-primary text-white rounded-top">
+                            <h5 class="modal-title">
+                                <i class="fas fa-edit me-2"></i>Editar Funcionário
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formEditarFuncionario" method="POST" action="">
+                                <input type="hidden" name="funcionarioId" id="editarFuncionarioId">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="editarNomeFuncionario" class="form-label">Nome Completo *</label>
+                                        <input type="text" class="form-control" id="editarNomeFuncionario"
+                                            name="editarNomeFuncionario" required>
+                                        <label for="editarCargoFuncionario" class="form-label mt-3">Cargo *</label>
+                                        <select class="form-select" id="editarCargoFuncionario"
+                                            name="editarCargoFuncionario" required>
+                                            <option value="Bibliotecário">Bibliotecário</option>
+                                            <option value="Atendente">Atendente</option>
+                                            <option value="Administrador">Administrador</option>
+                                            <option value="Assistente">Assistente</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="editarEmailFuncionario" class="form-label">Email Institucional
+                                            *</label>
+                                        <input type="email" class="form-control" id="editarEmailFuncionario"
+                                            name="editarEmailFuncionario" required>
+                                        <label for="editarSenhaFuncionario" class="form-label mt-3">Redefinir Senha
+                                            Temporária</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="editarSenhaFuncionario"
+                                                name="editarSenhaFuncionario">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                id="gerarSenhaFuncionario">
+                                                <i class="fas fa-sync-alt"></i> Gerar
+                                            </button>
+                                        </div>
+                                        <small class="text-muted">O funcionário deverá alterar a senha no primeiro
+                                            acesso após a redefinição.</small>
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="modal-footer bg-light rounded-bottom">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" form="formEditarFuncionario" class="btn btn-primary">Salvar
+                                Alterações</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Gerenciar Permissões -->
+            <div class="modal fade user-modal" id="modalPermissoesFuncionario" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-3 shadow-sm border-0">
+                        <div class="modal-header bg-info text-white rounded-top">
+                            <h5 class="modal-title">
+                                <i class="fas fa-key me-2"></i>Permissões de Acesso
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="d-flex align-items-center mb-4">
+                                <img id="permissaoAvatar" src="" class="rounded-circle me-3" width="60" height="60"
+                                    alt="Avatar">
+                                <div>
+                                    <h6 id="permissaoNome" class="mb-0 fw-semibold"></h6>
+                                    <small class="text-muted" id="permissaoCargo"></small>
+                                </div>
+                            </div>
+
+                            <form id="formPermissoesFuncionario" method="POST" action="">
+                                <input type="hidden" name="funcionarioId" id="permissoesFuncionarioId">
+
+                                <label class="form-label">Nível de Acesso</label>
+                                <select class="form-select mb-3" id="nivelAcesso">
+                                    <option value="" disabled selected>Selecione...</option>
+                                    <option value="1">Básico (Apenas consultas)</option>
+                                    <option value="2">Operacional (Empréstimos/Devoluções)</option>
+                                    <option value="3">Gerencial (Gerenciamento completo)</option>
+                                    <option value="4">Administrador (Acesso total)</option>
+                                </select>
+
+                                <label class="form-label">Permissões específicas</label>
+                                <div class="border rounded p-3 mb-3">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="permEmprestimos"
+                                            name="permEmprestimos">
+                                        <label class="form-check-label" for="permEmprestimos">Gerenciar
+                                            Empréstimos</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="permEstoque"
+                                            name="permEstoque">
+                                        <label class="form-check-label" for="permEstoque">Gerenciar Estoque</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="permUsuarios"
+                                            name="permUsuarios">
+                                        <label class="form-check-label" for="permUsuarios">Gerenciar Usuários</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="permAcessoTotal">
+                                    <label class="form-check-label" for="permAcessoTotal">Acesso Administrativo
+                                        Completo</label>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer bg-light rounded-bottom">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" form="formPermissoesFuncionario"
+                                class="btn btn-info text-white">Salvar Permissões</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Desativar Funcionário -->
+            <div class="modal fade" id="modalDesativarFuncionario" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-3 shadow-sm border-0">
+                        <div class="modal-header bg-danger text-white rounded-top">
+                            <h5 class="modal-title">
+                                <i class="fas fa-user-slash me-2"></i>Desativar Funcionário
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="d-flex align-items-center mb-4">
+                                <img id="desativarAvatar" src="" class="rounded-circle me-3" width="60" height="60"
+                                    alt="Avatar">
+                                <div>
+                                    <h6 id="desativarNome" class="mb-0 fw-semibold"></h6>
+                                    <small class="text-muted" id="desativarCargo"></small>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning d-flex align-items-center">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <div><strong>Atenção:</strong> Esta ação irá desativar o acesso do funcionário ao
+                                    sistema.</div>
+                            </div>
+
+                            <form id="formDesativarFuncionario" method="POST" action="/desativar-funcionario/">
+                                <input type="hidden" id="desativarFuncionarioId" name="funcionarioId">
+                                <input type="hidden" id="novoStatusFuncionario" name="novoStatus">
+                                <div class="mb-3" id="motivoDesativacaoGroup">
+                                    <label for="motivoDesativacao" class="form-label">Motivo da desativação</label>
+                                    <select class="form-select" id="motivoDesativacao" name="motivo" required>
+                                        <option value="">Selecione um motivo</option>
+                                        <option value="desligamento">Desligamento</option>
+                                        <option value="ferias">Férias</option>
+                                        <option value="licenca">Licença</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="observacoesDesativacao" class="form-label">Observações</label>
+                                    <textarea class="form-control" id="observacoesDesativacao" name="observacoes"
+                                        rows="3"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer bg-light rounded-bottom">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" form="formDesativarFuncionario" class="btn btn-danger">Confirmar
+                                Desativação</button>
                         </div>
                     </div>
                 </div>
@@ -563,6 +1092,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- JavaScript Personalizado -->
     <script src="{{ url_for('static', filename='js/usuarios-scripts.js') }}"></script>
+
 </body>
 
 </html>

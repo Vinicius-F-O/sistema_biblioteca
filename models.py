@@ -12,6 +12,10 @@ class Funcionario(UserMixin, db.Model):
     senha = db.Column(db.String(200), nullable=False)
     dataContratacao = db.Column(db.DateTime, default=datetime.utcnow)
     fotoPerfil = db.Column(db.String(200), nullable=True)
+    statusFuncionario = db.Column(db.String(20), nullable=True)
+    perm_emprestimos = db.Column(db.Boolean, default=True)
+    perm_estoque = db.Column(db.Boolean, default=True)
+    perm_usuarios = db.Column(db.Boolean, default=True)
     
     def __repr__(self):
         return f"<{self.nome}>"
@@ -29,7 +33,7 @@ class Livro(db.Model):
     nota = db.Column(db.Float, nullable=True)
     qtdEstoque = db.Column(db.Integer, nullable=False)
     tipoServico = db.Column(db.String(20), nullable=True)
-    disponibilidade = db.Column(db.String(20), nullable=True)
+    disponibilidade = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f"<{self.titulo}>"
@@ -41,6 +45,7 @@ class Cliente(db.Model):
     cpf = db.Column(db.String(15), nullable=True, unique=True)
     email = db.Column(db.String(100), nullable=False)
     telefone = db.Column(db.String(20), nullable=False)
+    statusCliente = db.Column(db.String(20), nullable=True)
 
     def __repr__(self):
         return f"<{self.nome}>"
@@ -48,12 +53,22 @@ class Cliente(db.Model):
 class Servico(db.Model):
     __tablename__ = 'servicos'
     id = db.Column(db.Integer, primary_key=True)
-    idFuncionario = db.Column(db.Integer, nullable=False)
-    idCliente = db.Column(db.Integer, nullable=False)
-    idLivro = db.Column(db.Integer, nullable=False)
+    
+    idFuncionario = db.Column(db.Integer, db.ForeignKey('funcionarios.id'), nullable=False)
+    idCliente = db.Column(db.Integer, db.ForeignKey('clientes.id'), nullable=False)
+    idLivro = db.Column(db.Integer, db.ForeignKey('livros.id'), nullable=False)
+
     categoriaServico = db.Column(db.String(15), nullable=False)
     dataServico = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     dataPrevistaDevolucao = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    dataDevolucao = db.Column(db.DateTime, nullable=True)
+    multa = db.Column(db.Float, nullable=True)
+    statusServico = db.Column(db.String(20), nullable=True)
+
+    # Relacionamentos
+    livro = db.relationship('Livro', backref='servicos', lazy=True)
+    cliente = db.relationship('Cliente', backref='servicos', lazy=True)
+    funcionario = db.relationship('Funcionario', backref='servicos', lazy=True)
 
     def __repr__(self):
         return f"<{self.id}>"

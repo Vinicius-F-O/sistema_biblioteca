@@ -8,13 +8,15 @@
   --dark-purple: #3c096c;
   --text-light: #f8f9fa;
   --text-dark: #212529;
-  --bg-color: #f5f7fa;
+  --bg-color: #f8f9fa;
+  --card-shadow: 0 10px 20px rgba(92, 26, 155, 0.1);
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 body {
   font-family: "Poppins", sans-serif;
-  background-color: #f5f7fa;
-  color: #333;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
   overflow-x: hidden;
 }
 
@@ -85,7 +87,6 @@ body {
   transition: all 0.2s;
 }
 
-
 .sidebar-menu li a:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
@@ -124,41 +125,25 @@ h2 span.sidebar-text {
   }
 }
 
+/* Main Content - Layout Moderno */
 .main-content {
+  background-color: var(--bg-color);
   margin-left: var(--sidebar-width);
   transition: all 0.3s;
   min-height: 100vh;
-  padding: 1.5rem;
+  padding: 2rem;
 }
 
 .sidebar.collapsed ~ .main-content {
   margin-left: var(--sidebar-collapsed-width);
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-  .sidebar {
-    left: -260px;
-  }
-
-  .sidebar.active {
-    left: 0;
-  }
-
-  .main-content {
-    margin-left: 0;
-    padding: 1rem;
-  }
-
-  .sidebar.collapsed {
-    left: -80px;
-  }
-
-  .sidebar.collapsed.active {
-    left: 0;
-  }
+.estoque-content {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
+/* Barra Superior - User Profile */
 .user-profile {
   display: flex;
   align-items: center;
@@ -180,15 +165,6 @@ h2 span.sidebar-text {
   object-fit: cover;
 }
 
-.profile-name {
-  font-weight: 600;
-}
-
-.profile-role {
-  font-size: 0.8rem;
-  color: #6c757d;
-}
-
 .icon-notification {
   font-size: 1.25rem; /* mais proporcional ao texto fs-6 */
   color: var(--accent-color);
@@ -198,30 +174,166 @@ h2 span.sidebar-text {
   cursor: pointer;
 }
 
-/* Barra de Busca e Status */
-.barra-container {
-  margin-bottom: 1.5rem;
+.icon-notification:hover {
+  transform: scale(1.1);
 }
 
+.icon-notification::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  background-color: #ff6b6b;
+  border-radius: 50%;
+  border: 2px solid var(--bg-color);
+}
+
+/* Título da Página */
+.estoque-title {
+  position: relative;
+  display: inline-block;
+  color: var(--dark-purple);
+}
+
+.estoque-title::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    var(--accent-color),
+    var(--secondary-color)
+  );
+  border-radius: 2px;
+}
+
+/* Barra de Busca Moderna */
 .barra-busca {
-  background-color: white;
+  background: white;
+  border-radius: 12px;
   padding: 1rem;
-  border-radius: 8px 8px 0 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
 }
 
-.barra-status {
-  background-color: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+.barra-busca:hover {
+  box-shadow: 0 15px 30px rgba(92, 26, 155, 0.15);
 }
 
-/* Tabela */
-.card {
+.barra-busca .input-group {
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.barra-busca .form-control {
+  border: 1px solid rgba(157, 78, 221, 0.3);
+  padding: 0.75rem 1rem;
+  transition: var(--transition);
+}
+
+.barra-busca .form-control:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.2);
+}
+
+.btn-adicionar {
+  background: linear-gradient(
+    to right,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(92, 26, 155, 0.2);
+}
+
+.btn-adicionar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(92, 26, 155, 0.3);
+}
+
+.btnCancelarModal {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btnCancelarModal:hover {
+  background-color: #f8f9fa;
+  border-color: crimson;
+  color: crimson;
+}
+
+/* Estatísticas em Cards Interativos */
+.barra-status {
+  margin-bottom: 2rem;
+}
+
+.barra-status > div {
+  padding: 0.5rem;
+}
+
+.barra-status .h-100 {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+  border-left: 4px solid var(--secondary-color);
+}
+
+.barra-status .h-100:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(92, 26, 155, 0.15);
+}
+
+.barra-status h3 {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.barra-status p {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark-purple);
+  margin-bottom: 0;
+}
+
+.circulo-warning,
+.circulo-danger {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.circulo-warning {
+  background-color: #ffc107;
+}
+
+.circulo-danger {
+  background-color: #dc3545;
+}
+
+/* Tabela Moderna */
+.card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+.table-responsive {
+  border-radius: 12px;
 }
 
 .table {
@@ -229,187 +341,142 @@ h2 span.sidebar-text {
 }
 
 .table thead th {
-  padding: 1rem;
-  font-weight: 500;
-  color: #6c757d;
+  background-color: rgba(157, 78, 221, 0.05);
+  color: var(--primary-color);
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.5px;
-  background-color: #f8f9fa;
+  padding: 1rem;
+  border-bottom: 2px solid rgba(157, 78, 221, 0.1);
 }
 
-.table td {
-  padding: 0.75rem 1rem;
+.table tbody tr {
+  transition: var(--transition);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(157, 78, 221, 0.03);
+}
+
+.table tbody td {
+  padding: 1rem;
   vertical-align: middle;
+  border-top: 1px solid rgba(157, 78, 221, 0.05);
 }
 
-.book-cover-small {
-  width: 40px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 4px;
+/* Badges de Estoque */
+.badge {
+  font-weight: 500;
+  padding: 0.5em 0.8em;
+  border-radius: 8px;
+  font-size: 0.75rem;
 }
 
-/* Botões e controles */
-.btn-adicionar {
-  background-color: #25d6aa;
+.bg-success {
+  background-color: rgba(40, 167, 69, 0.1) !important;
+  color: #28a745 !important;
+}
+
+.bg-warning {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+  color: #ffc107 !important;
+}
+
+.bg-danger {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+  color: #dc3545 !important;
+}
+
+/* Botões de Ação */
+
+.btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+  transition: var(--transition);
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
 }
 
-.btn-adicionar:hover {
-  background-color: #20c098;
-  color: white;
+/* Paginação */
+.pagination {
+  margin-bottom: 0;
 }
-
-.form-switch .form-check-input {
-  width: 2.5em;
-  height: 1.5em;
-  cursor: pointer;
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .sidebar {
-    left: -250px;
-  }
-
-  .sidebar.active {
-    left: 0;
-  }
-
-  .main-content {
-    margin-left: 0;
-    padding: 1rem;
-  }
-
-  .sidebar.collapsed {
-    left: -70px;
-  }
-
-  .sidebar.collapsed.active {
-    left: 0;
-  }
-
-  .barra-busca,
-  .barra-status {
-    padding: 0.75rem;
-  }
-}
-
-.circulo-warning {
-  height: 1rem;
-  width: 1rem;
-  background-color: rgb(252, 188, 10);
-  border-radius: 1rem;
-  display: flex;
-  align-items: center;
-}
-
-.circulo-danger {
-  height: 1rem;
-  width: 1rem;
-  background-color: crimson;
-  border-radius: 1rem;
-  display: flex;
-  align-items: center;
-}
-
-/* Estilos para o modal de cadastro de livros */
-#cadastroLivroModal .modal-content {
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+/* Modal Moderno */
+.modal-content {
   border: none;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
-#cadastroLivroModal .modal-header {
-  background: linear-gradient(135deg, #5a189a 0%, #7b2cbf 100%);
+.modal-header {
+  background: linear-gradient(
+    to right,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   color: white;
-  border-radius: 12px 12px 0 0;
-  border-bottom: none;
   padding: 1.5rem;
 }
 
-#cadastroLivroModal .modal-title {
-  font-weight: 600;
-  font-size: 1.4rem;
-}
-
-#cadastroLivroModal .modal-body {
+.modal-body {
   padding: 2rem;
 }
 
-#cadastroLivroModal .modal-footer {
-  border-top: 1px solid #f0f0f0;
-  padding: 1.5rem 2rem;
+.modal-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
 }
 
-#cadastroLivroModal .form-control,
-#cadastroLivroModal .form-select {
+/* Formulário no Modal */
+.form-control,
+.form-select {
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  border: 1px solid #e0e0e0;
-  transition: all 0.3s ease;
+  border: 1px solid rgba(157, 78, 221, 0.3);
 }
 
-#cadastroLivroModal .form-control:focus,
-#cadastroLivroModal .form-select:focus {
-  border-color: #9d4edd;
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--accent-color);
   box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.2);
 }
 
-#cadastroLivroModal .btn-primary {
-  background: linear-gradient(to right, #7b2cbf, #5a189a);
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-#cadastroLivroModal .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(122, 44, 191, 0.4);
-}
-
-#cadastroLivroModal .btn-outline-secondary {
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-#cadastroLivroModal .btn-outline-secondary:hover {
-  background-color: #f8f9fa;
-  border-color: crimson;
-  color: crimson;
-}
-
-.btn-adicionar {
-  background: linear-gradient(to right, #7b2cbf, #5a189a);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.btn-adicionar:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(122, 44, 191, 0.4);
-}
-
 /* Pré-visualização da capa (opcional) */
-#previewCapa {
+#previewCapa,
+#editPreviewCapa {
   max-width: 100%;
-  max-height: 200px; /* Altura máxima desejada */
+  max-height: 200px;
   width: auto;
   height: auto;
-  object-fit: contain; /* Mantém a proporção */
+  object-fit: contain;
   border-radius: 6px;
   margin-top: 10px;
   display: none;
   border: 1px solid #eee;
-  background-color: #f8f9fa; /* Cor de fundo para imagens transparentes */
+  background-color: #f8f9fa;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+  .barra-status > div {
+    margin-bottom: 1rem;
+  }
+
+  .barra-busca .col-md-8,
+  .barra-busca .col-md-4 {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
 }
