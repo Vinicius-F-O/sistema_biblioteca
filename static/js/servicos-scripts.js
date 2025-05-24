@@ -66,44 +66,56 @@ saleRadio.addEventListener("change", function () {
 // Set default date to today
 document.getElementById("transactionDate").valueAsDate = new Date();
 
+// ================== BUSCA DE LIVRO ==================
 const input = document.getElementById("bookSearch");
 const suggestionBox = document.getElementById("suggestions");
 
-input.addEventListener("input", function () {
-  const query = this.value.toLowerCase();
-  suggestionBox.innerHTML = "";
+input.addEventListener("input", async () => {
+  const query = input.value.trim();
 
   if (query.length < 2) {
     suggestionBox.style.display = "none";
     return;
   }
 
-  const filtered = books.filter(
-    (book) =>
-      book.titulo.toLowerCase().includes(query) ||
-      book.autor.toLowerCase().includes(query) ||
-      book.editora.toLowerCase().includes(query) ||
-      String(book.id).includes(query)
-  );
+  try {
+    const response = await fetch(
+      `/buscar-livros?query=${encodeURIComponent(query)}`
+    );
+    const data = await response.json();
 
-  if (filtered.length === 0) {
-    suggestionBox.style.display = "none";
-    return;
-  }
+    suggestionBox.innerHTML = "";
+    const filtered = data.livros || [];
 
-  filtered.forEach((book) => {
-    const li = document.createElement("li");
-    li.classList.add("dropdown-item");
-    li.textContent = `${book.titulo} - ${book.autor}`;
-    li.addEventListener("click", () => {
-      input.value = book.titulo;
-      suggestionBox.innerHTML = "";
-      suggestionBox.style.display = "none";
+    if (filtered.length === 0) {
+      suggestionBox.innerHTML =
+        '<li class="dropdown-item disabled">Nenhum livro encontrado</li>';
+    }
+
+    filtered.forEach((book) => {
+      const li = document.createElement("li");
+      li.classList.add("dropdown-item");
+
+      if (book.disponibilidade === false) {
+        li.textContent = `${book.titulo} - ${book.autor} (Indisponível)`;
+        li.classList.add("disabled", "text-muted");
+        li.style.pointerEvents = "none";
+      } else {
+        li.textContent = `${book.titulo} - ${book.autor}`;
+        li.addEventListener("click", () => {
+          input.value = book.titulo;
+          suggestionBox.innerHTML = "";
+          suggestionBox.style.display = "none";
+        });
+      }
+
+      suggestionBox.appendChild(li);
     });
-    suggestionBox.appendChild(li);
-  });
 
-  suggestionBox.style.display = "block";
+    suggestionBox.style.display = "block";
+  } catch (error) {
+    console.error("Erro na busca de livros:", error);
+  }
 });
 
 // Esconde o dropdown quando clicar fora
@@ -113,36 +125,21 @@ document.addEventListener("click", (e) => {
   }
 });
 
-//Busca Cliente
+// ================== BUSCA DE CLIENTE ==================
 const inputCPF = document.getElementById("clienteSelect");
 const clienteInfoDiv = document.getElementById("clienteInfo");
+const btnAdicionar = document.querySelector(".btnAdicionar");
 
-// Máscara de CPF
-inputCPF.addEventListener("input", function (e) {
-  let value = e.target.value.replace(/\D/g, "");
+inputCPF.addEventListener("input", () => {
+  const cpf = inputCPF.value.replace(/\D/g, "");
+
+  // Máscara de CPF
+  let value = inputCPF.value.replace(/\D/g, "");
   if (value.length > 3) value = value.replace(/^(\d{3})/, "$1.");
   if (value.length > 7) value = value.replace(/^(\d{3})\.(\d{3})/, "$1.$2.");
   if (value.length > 11)
     value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})/, "$1.$2.$3-");
-  e.target.value = value.substring(0, 14);
-});
-
-const form = document.getElementById("formServico"); // Substitua pelo ID real do seu <form>
-
-form.addEventListener("submit", function (e) {
-  const cpfInput = document.getElementById("clienteSelect");
-  cpfInput.value = cpfInput.value.replace(/\D/g, ""); // Remove todos os caracteres não numéricos
-  // Bloqueia envio se o botão estiver desabilitado
-  if (document.querySelector(".btnAdicionar").disabled) {
-    e.preventDefault();
-    alert(
-      "O cliente possui multas pendentes e não pode realizar novos serviços."
-    );
-  }
-});
-
-inputCPF.addEventListener("input", () => {
-  const cpf = inputCPF.value.replace(/\D/g, ""); // Remove não dígitos
+  inputCPF.value = value.substring(0, 14);
 
   if (cpf.length === 11) {
     fetch(`/buscar-cliente?cpf=${cpf}`)
@@ -151,8 +148,12 @@ inputCPF.addEventListener("input", () => {
         if (data.found) {
           let multaInfo = "";
           let avisoMulta = "";
+          let avisoStatus = "";
 
-          if (data.multas_pendentes && data.multas_pendentes > 0) {
+          const temMulta = data.multas_pendentes && data.multas_pendentes > 0;
+          const inativo = data.status === "Inativo";
+
+          if (temMulta) {
             multaInfo = `
               <span class="small text-danger mt-1">
                 <i class="fas fa-exclamation-triangle me-1"></i>
@@ -166,37 +167,66 @@ inputCPF.addEventListener("input", () => {
             `;
           }
 
+          if (inativo) {
+            avisoStatus = `
+              <span class="text-danger d-block mt-2 fs-6">
+                O cliente selecionado está inativo e portanto não pode ter novos serviços cadastrados.
+              </span>
+            `;
+          }
+
           clienteInfoDiv.innerHTML = `
             <div class="card border-primary mb-2" style="max-width: 350px;">
               <div class="card-body py-2 px-3">
                 <div class="d-flex flex-column">
-                  <span class="fw-bold text-primary mb-1"><i class="fas fa-user me-1"></i> ${data.nome}</span>
-                  <span class="small text-muted mb-1"><i class="fas fa-id-card me-1"></i> ID: ${data.id}</span>
-                  <span class="small text-muted"><i class="fas fa-envelope me-1"></i> ${data.email}</span>
+                  <span class="fw-bold text-primary mb-1">
+                    <i class="fas fa-user me-1"></i> ${data.nome}
+                  </span>
+                  <span class="small text-muted mb-1">
+                    <i class="fas fa-id-card me-1"></i> ID: ${data.id}
+                  </span>
+                  <span class="small text-muted mb-1">
+                    <i class="fas fa-envelope me-1"></i> ${data.email}
+                  </span>
                   ${multaInfo}
+                  ${data.status === "Inativo" ? `<span class="small text-muted">
+                    <i class="fas fa-info-circle me-1"></i>Status: ${data.status}
+                  </span>` : ""}
                 </div>
               </div>
             </div>
             ${avisoMulta}
+            ${avisoStatus}
           `;
 
-          // Habilita ou bloqueia o botão de adicionar
-          document.querySelector(".btnAdicionar").disabled = !!(
-            data.multas_pendentes && data.multas_pendentes > 0
-          );
+          // Desativa o botão se cliente tem multa ou está inativo
+          btnAdicionar.disabled = temMulta || inativo;
         } else {
           clienteInfoDiv.innerHTML = `<span class="text-danger">Cliente não encontrado.</span>`;
-          document.querySelector(".btnAdicionar").disabled = true;
+          btnAdicionar.disabled = true;
         }
       })
       .catch((error) => {
         clienteInfoDiv.innerHTML = `<span class="text-danger">Erro ao buscar cliente.</span>`;
-        document.querySelector(".btnAdicionar").disabled = true;
+        btnAdicionar.disabled = true;
         console.error(error);
       });
   } else {
     clienteInfoDiv.innerHTML = "";
-    document.querySelector(".btnAdicionar").disabled = false;
+    btnAdicionar.disabled = false;
+  }
+});
+
+// ================== SUBMISSÃO ==================
+const form = document.getElementById("formServico");
+
+form.addEventListener("submit", function (e) {
+  const cpfInput = document.getElementById("clienteSelect");
+  cpfInput.value = cpfInput.value.replace(/\D/g, "");
+
+  if (btnAdicionar.disabled) {
+    e.preventDefault();
+    alert("O cliente não está apto para realizar novos serviços.");
   }
 });
 
@@ -244,3 +274,55 @@ document
         });
     }
   });
+
+// Configuração do modal de pagamento de multa
+document.querySelectorAll(".btn-pagamento").forEach((btn) => {
+  btn.addEventListener("click", function () {
+    const servicoId = this.getAttribute("data-id");
+    fetch(`/api/servico/${servicoId}`)
+      .then((response) => response.json())
+      .then((servico) => {
+        document.getElementById("multaCapaLivro").src = servico.livro.capa;
+        document.getElementById("multaTituloLivro").textContent =
+          servico.livro.titulo;
+        document.getElementById("multaNomeCliente").textContent =
+          servico.cliente.nome;
+        document.getElementById("multaMotivo").textContent =
+          servico.motivoMulta;
+        document.getElementById("multaDataDevolucao").textContent =
+          servico.dataDevolucao || '-';
+        document.getElementById("multaDataDevolucaoReal").textContent =
+          servico.dataDevolucaoReal || '-';
+        document.getElementById("multaValor").textContent =
+          `R$ ${parseFloat(servico.multa).toFixed(2)}`;
+      });
+  });
+});
+
+// Configuração do modal de renovação (substituindo o botão de edição)
+document.querySelectorAll(".btn-editar").forEach((btn) => {
+  btn.addEventListener("click", function () {
+    const servicoId = this.getAttribute("data-id");
+    fetch(`/api/servico/${servicoId}`)
+      .then((response) => response.json())
+      .then((servico) => {
+        document.getElementById("renovacaoCapaLivro").src = servico.livro.capa;
+        document.getElementById("renovacaoTituloLivro").textContent =
+          servico.livro.titulo;
+        document.getElementById("renovacaoNomeCliente").textContent =
+          servico.cliente.nome;
+        document.getElementById("renovacaoDataAtual").textContent =
+          servico.dataDevolucao;
+
+        // Configurar data mínima/máxima para renovação
+        const hoje = new Date();
+        const dataMaxima = new Date();
+        dataMaxima.setDate(hoje.getDate() + 15);
+
+        const inputData = document.getElementById("novaDataDevolucao");
+        inputData.min = hoje.toISOString().split("T")[0];
+        inputData.max = dataMaxima.toISOString().split("T")[0];
+        inputData.value = dataMaxima.toISOString().split("T")[0];
+      });
+  });
+});

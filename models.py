@@ -16,6 +16,8 @@ class Funcionario(UserMixin, db.Model):
     perm_emprestimos = db.Column(db.Boolean, default=True)
     perm_estoque = db.Column(db.Boolean, default=True)
     perm_usuarios = db.Column(db.Boolean, default=True)
+    senha_temporaria = db.Column(db.Boolean, default=True)
+    ultimo_acesso = db.Column(db.DateTime, nullable=True)
     
     def __repr__(self):
         return f"<{self.nome}>"

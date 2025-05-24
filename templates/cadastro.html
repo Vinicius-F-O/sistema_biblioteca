@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,11 +12,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro-styles.css') }}">
 </head>
+
 <body>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-messages-container position-fixed top-0 end-0 p-3" style="z-index: 9999; max-width: 400px;">
+    {% for category, message in messages %}
+    {% if category in ['success', 'danger', 'warning', 'info'] %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-lg mb-3" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
 
   <div class="container-fluid">
     <div class="row min-vh-100">
-      
+
       <!-- Coluna esquerda com informações do sistema -->
       <div class="col-lg-6 d-none d-lg-flex left-info">
         <div class="content-wrapper">
@@ -24,8 +41,10 @@
             <h1>Codex</h1>
           </div>
           <h2>Transforme sua gestão bibliotecária</h2>
-          <p class="mb-4">Codex é um sistema de biblioteca moderno que permite gerenciar empréstimos, usuários e acervos com facilidade. Reduza atrasos, organize sua coleção e ofereça uma experiência de leitura digital com mais controle e praticidade.</p>
-          
+          <p class="mb-4">Codex é um sistema de biblioteca moderno que permite gerenciar empréstimos, usuários e acervos
+            com facilidade. Reduza atrasos, organize sua coleção e ofereça uma experiência de leitura digital com mais
+            controle e praticidade.</p>
+
           <div class="features">
             <div class="feature-item">
               <i class="fas fa-bolt"></i>
@@ -40,7 +59,7 @@
               <span>Relatórios detalhados</span>
             </div>
           </div>
-          
+
           <div class="book-animation">
             <div class="book"></div>
             <div class="book"></div>
@@ -55,35 +74,49 @@
         <div class="card card-register p-4 w-100">
           <div class="card-body">
             <div class="text-center mb-4">
-              <h3 class="card-title fw-bold mb-2">Crie sua conta</h3>
+              <h3 class="card-title fw-bold mb-2 fs-3">Crie sua conta de administrador</h3>
               <p class="text-muted">Junte-se a milhares de bibliotecas que usam o Codex</p>
             </div>
-            
+
             <form action="" method="post">
               <div class="mb-3 form-floating">
-                <input type="text" class="form-control" id="nome" placeholder="Digite seu nome completo" name="nomeForm" required>
+                <input type="password" class="form-control" id="codigoAcesso" placeholder="Código de acesso"
+                  name="codigoAcessoForm" required>
+                <label for="codigoAcesso">Código de acesso</label>
+              </div>
+
+              <div class="mb-3 form-floating">
+                <input type="text" class="form-control" id="nome" placeholder="Digite seu nome completo" name="nomeForm"
+                  required>
                 <label for="nome">Nome completo</label>
               </div>
 
               <div class="mb-3 form-floating">
-                <input type="email" class="form-control" id="email" placeholder="exemplo@email.com" name="emailForm" required>
+                <input type="email" class="form-control" id="email" placeholder="exemplo@email.com" name="emailForm"
+                  required>
                 <label for="email">Email</label>
               </div>
 
               <div class="mb-3 form-floating">
                 <input type="password" class="form-control" id="senha" placeholder="********" name="senhaForm" required>
                 <label for="senha">Senha</label>
+                <div class="invalid-feedback" id="senhaErro">As senhas não coincidem.</div>
               </div>
 
+              <!-- Local para o alerta de senha -->
+              <div class="invalid" id="senhaErroContainer"></div>
+
               <div class="mb-3 form-floating">
-                <input type="password" class="form-control" id="repetirSenha" placeholder="********" name="repetirSenhaForm" required>
+                <input type="password" class="form-control" id="repetirSenha" placeholder="********"
+                  name="repetirSenhaForm" required>
                 <label for="repetirSenha">Repetir Senha</label>
               </div>
 
               <div class="form-check mb-4">
                 <input class="form-check-input" type="checkbox" id="termos" name="checkBoxTermosForm">
                 <label class="form-check-label" for="termos">
-                  Eu aceito os <a href="#" class="text-link">termos de uso</a> e <a href="#" class="text-link">política de privacidade</a>.
+                  Eu aceito os <a href="#" class="text-link">termos de uso</a> e <a href="#" class="text-link">política
+                    de privacidade</a>.
                 </label>
               </div>
 
@@ -102,9 +135,13 @@
           </div>
         </div>
       </div>
-    
+
     </div>
   </div>
 
+  <!-- Importa o JS específico da página de cadastro -->
+  <script src="{{ url_for('static', filename='js/cadastro-scripts.js') }}"></script>
+
 </body>
+
 </html>

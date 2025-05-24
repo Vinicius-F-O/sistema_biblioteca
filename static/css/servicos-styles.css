@@ -286,3 +286,18 @@ h2 span.sidebar-text {
 #suggestions li:hover {
   background-color: #f0f0f0;
 }
+
+#suggestions li.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dropdown-item.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.imgCapas {
+  width: 60px;
+  height: auto;
+}

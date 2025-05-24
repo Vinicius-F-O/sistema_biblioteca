@@ -105,7 +105,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-2">Total de Clientes</h6>
-                                    <h3 class="mb-0">142</h3>
+                                    <h3 class="mb-0">{{ stats_usuarios.total_clientes }}</h3>
                                 </div>
                                 <div class="bg-purple-soft rounded-circle p-3">
                                     <i class="fas fa-user-friends text-purple"></i>
@@ -123,14 +123,15 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-2">Total de Funcionários</h6>
-                                    <h3 class="mb-0">8</h3>
+                                    <h3 class="mb-0">{{ stats_usuarios.total_funcionarios }}</h3>
                                 </div>
                                 <div class="bg-purple-soft rounded-circle p-3">
                                     <i class="fas fa-user-tie text-purple"></i>
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <span class="badge bg-primary">3 bibliotecários</span>
+                                <span class="badge bg-primary">{{ stats_usuarios.total_bibliotecarios }}
+                                    bibliotecários</span>
                             </div>
                         </div>
                     </div>
@@ -141,14 +142,15 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-2">Empréstimos Ativos</h6>
-                                    <h3 class="mb-0">24</h3>
+                                    <h3 class="mb-0">{{ stats_usuarios.emprestimos_ativos }}</h3>
                                 </div>
                                 <div class="bg-purple-soft rounded-circle p-3">
                                     <i class="fas fa-book-open text-purple"></i>
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <span class="badge bg-warning">3 atrasados</span>
+                                <span class="badge bg-warning">{{ stats_usuarios.emprestimos_atrasados }}
+                                    atrasados</span>
                             </div>
                         </div>
                     </div>
@@ -159,14 +161,14 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted mb-2">Multas Pendentes</h6>
-                                    <h3 class="mb-0">5</h3>
+                                    <h3 class="mb-0">{{ stats_usuarios.multas_pendentes }}</h3>
                                 </div>
                                 <div class="bg-purple-soft rounded-circle p-3">
                                     <i class="fas fa-exclamation-triangle text-purple"></i>
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <span class="badge bg-danger">R$ 125,00</span>
+                                <span class="badge bg-danger">R$ {{ "%.2f"|format(stats_usuarios.valor_multas) }}</span>
                             </div>
                         </div>
                     </div>
@@ -292,7 +294,7 @@
                                                 <button class="btn btn-sm btn-outline-info btn-detalhes"
                                                     title="Detalhes" data-bs-toggle="modal"
                                                     data-bs-target="#modalDetalhesCliente" data-cpf="{{cliente.cpf}}"">
-                                                    <i class="fas fa-eye"></i>
+                                                    <i class=" fas fa-eye"></i>
                                                 </button>
                                                 <button
                                                     class="btn btn-sm {% if cliente.statusCliente == 'Ativo' %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
@@ -543,12 +545,6 @@
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label for="staffRegistration" class="form-label">Matrícula
-                                                        *</label>
-                                                    <input type="text" class="form-control" id="staffRegistration"
-                                                        name="matriculaStaffForm" required>
-                                                </div>
-                                                <div class="mb-3">
                                                     <label for="clientBirthdate" class="form-label">Data de
                                                         Contratação</label>
                                                     <input type="date" class="form-control" id="staffBirthdate"
@@ -568,6 +564,10 @@
                                                     <div class="input-group">
                                                         <input type="password" class="form-control" id="staffPassword"
                                                             name="passwordStaffForm" required>
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                            id="togglePassword">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
                                                         <button class="btn btn-outline-secondary" type="button"
                                                             id="generatePassword">
                                                             <i class="fas fa-sync-alt"></i> Gerar

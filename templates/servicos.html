@@ -220,6 +220,7 @@
                                     <th>Tipo</th>
                                     <th>Data</th>
                                     <th>Data Prev. Devolução</th>
+                                    <th>Data Devolução</th>
                                     <th>Status</th>
                                     <th width="120">Ações</th>
                                 </tr>
@@ -241,42 +242,55 @@
                                         {% if servico.categoriaServico == 'Empréstimo' %}
                                         <span class="badge badge-loan">Empréstimo</span>
                                         {% else %}
-                                        <span class="badge badge-sale bg-info">Venda</span>
+                                        <span class="badge badge-sale">Venda</span>
                                         {% endif %}
                                     </td>
                                     <td>{{ servico.dataServico.strftime('%d/%m/%Y') }}</td>
-                                    <td>{% if servico.dataPrevistaDevolucao %}{{
-                                        servico.dataPrevistaDevolucao.strftime('%d/%m/%Y') }}{% else %}-{% endif %}</td>
                                     <td>
-                                        {% if servico.statusServico == 'Atrasado' %}
-                                        <span class="badge bg-warning">Atrasado</span>
-                                        {% elif servico.statusServico == 'Ativo' %}
+                                        {% if servico.categoriaServico == 'Empréstimo' %}
+                                        {{ servico.dataPrevistaDevolucao.strftime('%d/%m/%Y') if
+                                        servico.dataPrevistaDevolucao else '-' }}
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ servico.dataDevolucao.strftime('%d/%m/%Y') if servico.dataDevolucao else '-' }}
+                                    </td>
+                                    <td>
+                                        {% if servico.categoriaServico == 'Venda' %}
+                                        -
+                                        {% else %}
+                                        {% if servico.statusServico == 'Ativo' %}
                                         <span class="badge bg-primary">Ativo</span>
                                         {% elif servico.statusServico == 'Concluído' %}
                                         <span class="badge bg-success">Concluído</span>
-                                        {% elif servico.statusServico == 'Renovado' %}
-                                        <span class="badge bg-info">Renovado</span>
-                                        {% elif servico.statusServico == 'Cancelado' %}
-                                        <span class="badge bg-secondary">Cancelado</span>
                                         {% elif servico.statusServico == 'Multa pendente' %}
                                         <span class="badge bg-danger">Multa pendente</span>
                                         {% else %}
                                         <span class="badge bg-secondary">{{ servico.statusServico }}</span>
                                         {% endif %}
+                                        {% endif %}
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary" title="Editar">
-                                            <i class="fas fa-edit"></i>
+                                        {% if servico.categoriaServico == 'Venda' or servico.statusServico ==
+                                        'Concluído' %}
+                                        <!-- Nenhum botão -->
+                                        {% elif servico.statusServico == 'Ativo' %}
+                                        <button class="btn btn-sm btn-outline-primary btn-editar" title="Renovar"
+                                            data-id="{{ servico.id }}" data-bs-toggle="modal"
+                                            data-bs-target="#modalRenovacaoServico">
+                                            <i class="fas fa-sync-alt"></i>
                                         </button>
-                                        {% if servico.categoriaServico == 'Empréstimo' and servico.statusServico ==
-                                        'Ativo' %}
                                         <button class="btn btn-sm btn-outline-success btn-devolver" title="Devolver"
                                             data-id="{{ servico.id }}" data-titulo="{{ servico.livro.titulo }}">
                                             <i class="fas fa-check"></i>
                                         </button>
-                                        {% else %}
-                                        <button class="btn btn-sm btn-outline-danger" title="Cancelar">
-                                            <i class="fas fa-times"></i>
+                                        {% elif servico.statusServico == 'Multa pendente' %}
+                                        <button class="btn btn-sm btn-outline-danger btn-pagamento"
+                                            title="Realizar Pagamento" data-id="{{ servico.id }}" data-bs-toggle="modal"
+                                            data-bs-target="#modalPagamentoMulta">
+                                            <i class="fas fa-money-bill-wave"></i>
                                         </button>
                                         {% endif %}
                                     </td>
@@ -416,6 +430,143 @@
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="button" class="btn btn-success" id="btnConfirmarDevolucao">Confirmar
                                 Devolução</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Pagamento de Multa -->
+            <div class="modal fade" id="modalPagamentoMulta" tabindex="-1" aria-labelledby="modalPagamentoMultaLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="modalPagamentoMultaLabel">
+                                <i class="fas fa-money-bill-wave me-2"></i> Pagamento de Multa
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-warning mb-4">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Atenção:</strong> Esta ação registrará o pagamento da multa e encerrará o
+                                serviço.
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <img id="multaCapaLivro" src="https://via.placeholder.com/60x90"
+                                        class="rounded me-3 imgCapas" alt="Capa do Livro">
+                                    <div>
+                                        <h6 id="multaTituloLivro" class="mb-1 fw-bold">Título do Livro</h6>
+                                        <p class="small text-muted mb-1">Cliente: <span id="multaNomeCliente">Nome do
+                                                Cliente</span></p>
+                                        <p class="small text-muted mb-1">Data prev. devolução: <span
+                                                id="multaDataDevolucao">00/00/0000</span></p>
+                                        <p class="small text-muted mb-1">Data de devolução: <span id="multaDataDevolucaoReal">-</span></p>
+                                    </div>
+                                </div>
+
+                                <div class="card border-danger mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">Valor da Multa</h6>
+                                                <p class="small text-muted mb-0">Motivo: <span id="multaMotivo">Atraso
+                                                        na devolução</span></p>
+                                            </div>
+                                            <h4 class="text-danger mb-0" id="multaValor">R$ 25,00</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form id="formPagamentoMulta">
+                                <div class="mb-3">
+                                    <label for="metodoPagamento" class="form-label">Método de Pagamento *</label>
+                                    <select class="form-select" id="metodoPagamento" required>
+                                        <option value="" selected disabled>Selecione...</option>
+                                        <option value="Dinheiro">Dinheiro</option>
+                                        <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                        <option value="Cartão de Débito">Cartão de Débito</option>
+                                        <option value="PIX">PIX</option>
+                                        <option value="Transferência">Transferência Bancária</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="dataPagamento" class="form-label">Data do Pagamento *</label>
+                                    <input type="date" class="form-control" id="dataPagamento" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="comprovantePagamento" class="form-label">Número do Comprovante</label>
+                                    <input type="text" class="form-control" id="comprovantePagamento"
+                                        placeholder="Opcional">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" form="formPagamentoMulta" class="btn btn-danger">Confirmar
+                                Pagamento</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Renovação de Serviço -->
+            <div class="modal fade" id="modalRenovacaoServico" tabindex="-1"
+                aria-labelledby="modalRenovacaoServicoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="modalRenovacaoServicoLabel">
+                                <i class="fas fa-sync-alt me-2"></i> Renovação de Empréstimo
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="d-flex align-items-center mb-4">
+                                <img id="renovacaoCapaLivro" src="https://via.placeholder.com/60x90"
+                                    class="rounded me-3 imgCapas" alt="Capa do Livro">
+                                <div>
+                                    <h6 id="renovacaoTituloLivro" class="mb-1 fw-bold">Título do Livro</h6>
+                                    <p class="small text-muted mb-1">Cliente: <span id="renovacaoNomeCliente">Nome do
+                                            Cliente</span></p>
+                                    <p class="small text-muted mb-1">Data atual de devolução: <span
+                                            id="renovacaoDataAtual" class="fw-bold">00/00/0000</span></p>
+                                </div>
+                            </div>
+
+                            <form id="formRenovacaoServico">
+                                <div class="mb-4">
+                                    <label for="novaDataDevolucao" class="form-label">Nova Data de Devolução *</label>
+                                    <input type="date" class="form-control" id="novaDataDevolucao" required>
+                                    <small class="text-muted">Período máximo de renovação: 15 dias</small>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Informação:</strong> Esta renovação será registrada no histórico do
+                                    empréstimo.
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="observacaoRenovacao" class="form-label">Observações</label>
+                                    <textarea class="form-control" id="observacaoRenovacao" rows="2"
+                                        placeholder="Opcional"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" form="formRenovacaoServico" class="btn btn-primary">Confirmar
+                                Renovação</button>
                         </div>
                     </div>
                 </div>

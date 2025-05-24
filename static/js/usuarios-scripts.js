@@ -86,6 +86,21 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+// Botão para gerar senha aleatória
+document
+  .getElementById("generatePassword")
+  .addEventListener("click", function () {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    passwordField.value = password;
+    passwordField.setAttribute("type", "text");
+    togglePassword.querySelector("i").classList.add("fa-eye-slash");
+  });
+
 // Gerar senha aleatória
 document
   .getElementById("generatePassword")
@@ -98,6 +113,17 @@ document
     }
     document.getElementById("staffPassword").value = password;
   });
+
+// Botão para mostrar/ocultar senha
+const togglePassword = document.getElementById("togglePassword");
+const passwordField = document.getElementById("staffPassword");
+
+togglePassword.addEventListener("click", function () {
+  const type =
+    passwordField.getAttribute("type") === "password" ? "text" : "password";
+  passwordField.setAttribute("type", type);
+  this.querySelector("i").classList.toggle("fa-eye-slash");
+});
 
 // Máscara para CPF
 document.getElementById("clientCpf").addEventListener("input", function (e) {
@@ -284,8 +310,11 @@ document.querySelectorAll(".btn-detalhes").forEach((btn) => {
       }
 
       // Preenche dados básicos
-      document.getElementById("detalhesAvatar").src =
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(data.nome)}&background=7B2CBF&color=fff&size=120&rounded=true&bold=true`;
+      document.getElementById(
+        "detalhesAvatar"
+      ).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        data.nome
+      )}&background=7B2CBF&color=fff&size=120&rounded=true&bold=true`;
       document.getElementById("detalhesNome").textContent = data.nome;
       document.getElementById("detalhesCpf").textContent = data.cpf;
       document.getElementById("detalhesEmail").textContent = data.email;
@@ -343,7 +372,6 @@ document.querySelectorAll(".btn-detalhes").forEach((btn) => {
       // Multas
       const multasContainer = document.getElementById("multasContainer");
       multasContainer.innerHTML = "";
-
       data.multas.forEach((m) => {
         multasContainer.innerHTML += `
           <div class="col-md-6">
@@ -356,7 +384,7 @@ document.querySelectorAll(".btn-detalhes").forEach((btn) => {
                 <p class="card-text small text-muted mb-2">Livro: ${m.livro}</p>
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
-                    <span class="badge bg-light text-dark small">
+                    <span class="badge bg-light text-dark small mb-1">
                       <i class="fas fa-calendar-times me-1"></i> Vencimento: ${m.vencimento}
                     </span>
                   </div>
@@ -364,6 +392,11 @@ document.querySelectorAll(".btn-detalhes").forEach((btn) => {
                     <i class="fas fa-dollar-sign"></i> Pagar
                   </button> -->
                 </div>
+                <div>
+                    <span class="badge bg-light text-dark small">
+                      <i class="fa-solid fa-calendar-check me-1"></i> Data Devolucao: ${m.data_devolucao}
+                    </span>
+                  </div>
               </div>
             </div>
           </div>

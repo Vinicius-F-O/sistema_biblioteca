@@ -5,12 +5,16 @@ from db import db
 from models import Funcionario, Livro, Cliente, Servico
 from datetime import datetime, date
 import hashlib
+from sqlalchemy import func
+from collections import defaultdict
 
 #Criar uma instância do Flask
 app = Flask(__name__)
 app.secret_key = 'A3deErivelton'
 lm = LoginManager(app)
 lm.login_view = 'login'
+lm.login_message = "Você precisa estar logado para acessar esta página."
+lm.login_message_category = "warning"
 
 #Adicionar database
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dados.db'
@@ -31,10 +35,119 @@ def user_loader(id):
 @app.route('/')
 @login_required
 def home():
-    return render_template("index.html")
+    # Consulta para contar empréstimos por livro
+    populares = (
+        db.session.query(
+            Livro,
+            func.count(Servico.id).label('total_emprestimos')
+        )
+        .join(Servico, Servico.idLivro == Livro.id)
+        .filter(Servico.categoriaServico == "Empréstimo")
+        .group_by(Livro.id)
+        .order_by(func.count(Servico.id).desc())
+        .limit(4)
+        .all()
+    )
+    # populares será uma lista de tuplas: (Livro, total_emprestimos)
+
+    # Buscar as 5 atividades mais recentes
+    atividades_recentes = (
+        db.session.query(Servico, Cliente, Livro)
+        .join(Cliente, Servico.idCliente == Cliente.id)
+        .join(Livro, Servico.idLivro == Livro.id)
+        .order_by(Servico.dataServico.desc())
+        .limit(5)
+        .all()
+    )
+
+    # Empréstimos mensais (do ano atual)
+    ano_atual = datetime.now().year
+    emprestimos_por_mes = [0] * 12  # Janeiro = 0, Dezembro = 11
+    emprestimos = (
+        db.session.query(Servico)
+        .filter(Servico.categoriaServico == "Empréstimo")
+        .filter(func.extract('year', Servico.dataServico) == ano_atual)
+        .all()
+    )
+    for s in emprestimos:
+        mes = s.dataServico.month - 1
+        emprestimos_por_mes[mes] += 1
+
+    # Tipos de livros (gêneros)
+    generos = db.session.query(Livro.genero, func.count(Livro.id)).group_by(Livro.genero).all()
+    generos_labels = [g[0] for g in generos]
+    generos_counts = [g[1] for g in generos]
+
+    hoje = datetime.now().date()
+    mes_atual = hoje.month
+    ano_atual = hoje.year
+
+    # Empréstimos ativos
+    emprestimos_ativos = db.session.query(Servico).filter(
+        Servico.categoriaServico == "Empréstimo",
+        Servico.statusServico == "Ativo"
+    ).count()
+
+    # Vendas de hoje
+    vendas_hoje = db.session.query(Servico).filter(
+        Servico.categoriaServico == "Venda",
+        func.date(Servico.dataServico) == hoje
+    ).all()
+    total_vendas_hoje = len(vendas_hoje)
+    valor_vendas_hoje = sum(float(v.livro.preco) for v in vendas_hoje if v.livro and v.livro.preco)
+
+    # Devoluções pendentes (empréstimos ativos)
+    devolucoes_pendentes = db.session.query(Servico).filter(
+        Servico.categoriaServico == "Empréstimo",
+        Servico.statusServico == "Ativo"
+    ).count()
+
+    # Devoluções previstas para hoje
+    devolucoes_hoje = db.session.query(Servico).filter(
+        Servico.categoriaServico == "Empréstimo",
+        Servico.statusServico == "Ativo",
+        func.date(Servico.dataPrevistaDevolucao) == hoje
+    ).count()
+
+    # Receita mensal (vendas do mês atual)
+    receita_mensal = db.session.query(Servico).join(Livro, Servico.idLivro == Livro.id).filter(
+        Servico.categoriaServico == "Venda",
+        func.extract('month', Servico.dataServico) == mes_atual,
+        func.extract('year', Servico.dataServico) == ano_atual
+    ).with_entities(func.sum(Livro.preco)).scalar() or 0
+
+    # Atrasados
+    atrasados = db.session.query(Servico).filter(
+        Servico.categoriaServico == "Empréstimo",
+        Servico.statusServico == "Ativo",
+        Servico.dataPrevistaDevolucao < datetime.now()
+    ).count()
+
+    stats = {
+        "emprestimos_ativos": emprestimos_ativos,
+        "atrasados": atrasados,
+        "vendas_hoje": total_vendas_hoje,
+        "valor_vendas_hoje": f"R$ {valor_vendas_hoje:,.2f}".replace(".", ",").replace(",", ".", 1),
+        "devolucoes_pendentes": devolucoes_pendentes,
+        "devolucoes_hoje": devolucoes_hoje,
+        "receita_mensal": f"R$ {receita_mensal:,.2f}".replace(".", ",").replace(",", ".", 1)
+    }
+
+    return render_template(
+        "index.html",
+        populares=populares,
+        atividades_recentes=atividades_recentes,
+        emprestimos_por_mes=emprestimos_por_mes,
+        generos_labels=generos_labels,
+        generos_counts=generos_counts,
+        stats=stats,
+        senha_temporaria=getattr(current_user, 'senha_temporaria', False)
+    )
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
+    CODIGO_ADMIN = "ProjetoCodexA3"  # Defina o código correto aqui
+
     if request.method == 'GET':
         return render_template("cadastro.html")
     elif request.method == 'POST':
@@ -43,8 +156,20 @@ def cadastro():
         senha = request.form.get('senhaForm')
         senhaRepetir = request.form.get('repetirSenhaForm')
         checkBoxTermos = request.form.get('checkBoxTermosForm')
+        codigo_acesso = request.form.get('codigoAcessoForm')
 
-        nova_pessoa = Funcionario(nome=nome, email=email, senha=hash(senha), statusFuncionario='Ativo')
+        if codigo_acesso != CODIGO_ADMIN:
+            flash('Código de acesso incorreto!', 'danger')
+            return render_template("cadastro.html")
+
+        nova_pessoa = Funcionario(
+            nome=nome,
+            email=email,
+            senha=hash(senha),
+            statusFuncionario='Ativo',
+            cargo='Administrador',  # Define automaticamente como Administrador
+            senha_temporaria=False  # Não exige troca de senha para administradores cadastrados
+        )
         db.session.add(nova_pessoa)
         db.session.commit()
         
@@ -65,6 +190,9 @@ def login():
             return 'Nome ou senha incorretos.'
         
         login_user(user)
+        user.ultimo_acesso = datetime.now()
+        db.session.commit()
+
         return redirect(url_for('home'))
 
 @app.route('/logout')
@@ -229,6 +357,10 @@ def servicos():
                 flash('Cliente não encontrado pelo CPF informado.', 'danger')
                 return redirect(url_for('servicos'))
 
+            if cliente.statusCliente != 'Ativo':
+                flash('Cliente não está ativo e não pode realizar novos serviços.', 'danger')
+                return redirect(url_for('servicos'))
+
             if not funcionario:
                 flash('Funcionário inválido.', 'danger')
                 return redirect(url_for('servicos'))
@@ -236,6 +368,15 @@ def servicos():
             if not livro:
                 flash('Livro não encontrado com os dados informados.', 'danger')
                 return redirect(url_for('servicos'))
+
+            # Verifica se há estoque disponível
+            if int(livro.qtdEstoque) <= 0:
+                flash('Livro sem estoque disponível para empréstimo ou venda.', 'danger')
+                return redirect(url_for('servicos'))
+
+            # Diminui o estoque em 1
+            livro.qtdEstoque = int(livro.qtdEstoque) - 1
+            db.session.add(livro)
 
             novo_servico = Servico(
                 idFuncionario=funcionario.id,
@@ -269,7 +410,31 @@ def usuarios():
             cliente.emprestimos_ativos = Servico.query.filter_by(idCliente=cliente.id, statusServico='Ativo').count()
             cliente.multas_pendentes = Servico.query.filter_by(idCliente=cliente.id, statusServico='Multa pendente').count()
 
-        return render_template("usuarios.html", funcionarios=funcionarios, clientes=clientes)
+        # Cálculos dos cards
+        total_clientes = Cliente.query.count()
+        total_funcionarios = Funcionario.query.count()
+        total_bibliotecarios = Funcionario.query.filter_by(cargo='Bibliotecário').count()
+        emprestimos_ativos = Servico.query.filter_by(statusServico='Ativo').count()
+        emprestimos_atrasados = Servico.query.filter(Servico.statusServico == 'Ativo', Servico.dataPrevistaDevolucao < datetime.now()).count()
+        multas_pendentes = Servico.query.filter_by(statusServico='Multa pendente').count()
+        valor_multas = db.session.query(func.sum(Servico.multa)).filter(Servico.statusServico == 'Multa pendente').scalar() or 0
+
+        stats_usuarios = {
+            "total_clientes": total_clientes,
+            "total_funcionarios": total_funcionarios,
+            "total_bibliotecarios": total_bibliotecarios,
+            "emprestimos_ativos": emprestimos_ativos,
+            "emprestimos_atrasados": emprestimos_atrasados,
+            "multas_pendentes": multas_pendentes,
+            "valor_multas": valor_multas,
+        }
+
+        return render_template(
+            "usuarios.html",
+            funcionarios=funcionarios,
+            clientes=clientes,
+            stats_usuarios=stats_usuarios
+        )
 
     elif request.method == 'POST':
         # Lógica para identificar se é cliente ou funcionário pelo nome de um campo exclusivo
@@ -289,7 +454,6 @@ def usuarios():
             # Formulário de Funcionário
             nome = request.form.get('nomeStaffForm')
             cargo = request.form.get('cargoStaffForm')
-            matricula = request.form.get('matriculaStaffForm')
             data_contratacao = request.form.get('dataContratacaoForm')
             email = request.form.get('emailStaffForm')
             senha = request.form.get('passwordStaffForm')
@@ -302,14 +466,14 @@ def usuarios():
             novo_funcionario = Funcionario(
                 nome=nome,
                 cargo=cargo,
-                matricula=matricula,
-                data_contratacao=data_contratacao,
+                dataContratacao=data_contratacao,
                 email=email,
                 senha=hash(senha),
                 statusFuncionario='Ativo',
-                permissao_emprestimos=perm_emprestimos,
-                permissao_estoque=perm_estoque,
-                permissao_usuarios=perm_usuarios
+                perm_emprestimos=perm_emprestimos,
+                perm_estoque=perm_estoque,
+                perm_usuarios=perm_usuarios,
+                senha_temporaria=True
             )
             novo_funcionario.nivel_acesso = request.form.get('nivelAcesso')
             novo_funcionario.perm_acesso_total = bool(request.form.get('permAcessoTotal'))
@@ -359,6 +523,7 @@ def buscar_cliente():
             "motivo": "Atraso na devolução",
             "livro": livro.titulo if livro else "Desconhecido",
             "vencimento": m.dataPrevistaDevolucao.strftime("%d/%m/%Y") if m.dataPrevistaDevolucao else "",
+            "data_devolucao": m.dataDevolucao.strftime("%d/%m/%Y") if m.dataDevolucao else "",
             "valor": f"R$ {valor_multa:.2f}"
         })
 
@@ -383,6 +548,9 @@ def buscar_cliente():
         "email": cliente.email,
         "cpf": cliente.cpf,
         "telefone": cliente.telefone,
+        "status": cliente.statusCliente,
+        "multas_pendentes": len(multas),
+        "multa": valor_total_multa,
         "emprestimos": lista_emprestimos,
         "multas": lista_multas
     })
@@ -398,7 +566,37 @@ def obter_livro(livro_id):
         "nota": livro.nota,
         "imgCapa": livro.imgCapa,
         "anoPublicacao": livro.anoPublicacao,
+        "disponibilidade": livro.disponibilidade
     })
+
+@app.route('/buscar-livros')
+@login_required
+def buscar_livros():
+    query = request.args.get('query', '').strip()
+    if not query:
+        return jsonify({'livros': []})
+
+    livros = Livro.query.filter(
+        (Livro.titulo.ilike(f"%{query}%")) |
+        (Livro.autor.ilike(f"%{query}%")) |
+        (Livro.editora.ilike(f"%{query}%")) |
+        (Livro.genero.ilike(f"%{query}%")) |
+        (Livro.id == query)  # permite buscar por ID exato
+    ).all()
+
+    livros_json = []
+    for livro in livros:
+        livros_json.append({
+            'id': livro.id,
+            'titulo': livro.titulo,
+            'autor': livro.autor,
+            'editora': livro.editora,
+            'genero': livro.genero,
+            'anoPublicacao': livro.anoPublicacao,
+            'disponibilidade': getattr(livro, 'disponibilidade', 1) if hasattr(livro, 'disponibilidade') else 1
+        })
+
+    return jsonify({'livros': livros_json})
 
 @app.route('/atualizar-disponibilidade/<int:id>', methods=['POST'])
 def atualizar_disponibilidade(id):
@@ -448,6 +646,12 @@ def devolver_servico(servico_id):
     else:
         servico.multa = 0.0
         servico.statusServico = 'Concluído'
+
+    # Incrementa o estoque do livro devolvido
+    livro = Livro.query.get(servico.idLivro)
+    if livro:
+        livro.qtdEstoque = int(livro.qtdEstoque) + 1
+        db.session.add(livro)
 
     db.session.commit()
 
@@ -537,6 +741,91 @@ def api_permissoes_funcionario(id):
             funcionario.perm_usuarios
         )
     })
+
+@app.route('/api/servico/<int:servico_id>')
+@login_required
+def api_servico(servico_id):
+    servico = Servico.query.get_or_404(servico_id)
+    livro = Livro.query.get(servico.idLivro)
+    cliente = Cliente.query.get(servico.idCliente)
+    return jsonify({
+        "id": servico.id,
+        "categoriaServico": servico.categoriaServico,
+        "statusServico": servico.statusServico,
+        "dataEmprestimo": servico.dataServico.strftime("%d/%m/%Y") if servico.dataServico else "",
+        "dataDevolucao": servico.dataPrevistaDevolucao.strftime("%d/%m/%Y") if servico.dataPrevistaDevolucao else "",
+        "dataDevolucaoReal": servico.dataDevolucao.strftime("%d/%m/%Y") if servico.dataDevolucao else "",
+        "multa": servico.multa or 0.0,
+        "motivoMulta": "Atraso na devolução" if servico.statusServico == "Multa pendente" else "",
+        "livro": {
+            "titulo": livro.titulo if livro else "",
+            "capa": livro.imgCapa if livro and livro.imgCapa else "https://via.placeholder.com/60x90"
+        },
+        "cliente": {
+            "nome": cliente.nome if cliente else "",
+            "email": cliente.email if cliente else ""
+        }
+    })
+
+@app.route('/renovar-servico/<int:servico_id>', methods=['POST'])
+@login_required
+def renovar_servico(servico_id):
+    servico = Servico.query.get_or_404(servico_id)
+    nova_data = request.json.get('novaDataDevolucao')
+    if not nova_data:
+        return jsonify({'success': False, 'error': 'Data não informada'}), 400
+    try:
+        from datetime import datetime
+        servico.dataPrevistaDevolucao = datetime.strptime(nova_data, '%Y-%m-%d')
+        # Não altera o status! Mantém como 'Ativo' ou o status atual
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/pagar-multa/<int:servico_id>', methods=['POST'])
+@login_required
+def pagar_multa(servico_id):
+    servico = Servico.query.get_or_404(servico_id)
+    servico.multa = 0
+    servico.statusServico = 'Concluído'
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/trocar-senha', methods=['GET', 'POST'])
+@login_required
+def trocar_senha():
+    if request.method == 'GET':
+        return render_template('trocar_senha.html')
+    elif request.method == 'POST':
+        nova_senha = request.form.get('novaSenha')
+        repetir_senha = request.form.get('repetirSenha')
+        if nova_senha != repetir_senha:
+            flash('As senhas não coincidem!', 'danger')
+            return render_template('trocar_senha.html')
+        current_user.senha = hash(nova_senha)
+        current_user.senha_temporaria = False
+        db.session.commit()
+        flash('Senha alterada com sucesso!', 'success')
+        return redirect(url_for('home'))
+
+@app.template_filter('tempo_relativo')
+def tempo_relativo(data):
+    agora = datetime.now()
+    diff = agora - data
+    segundos = diff.total_seconds()
+    if segundos < 60:
+        return "agora mesmo"
+    elif segundos < 3600:
+        minutos = int(segundos // 60)
+        return f"{minutos} minuto{'s' if minutos > 1 else ''} atrás"
+    elif segundos < 86400:
+        horas = int(segundos // 3600)
+        return f"{horas} hora{'s' if horas > 1 else ''} atrás"
+    else:
+        dias = int(segundos // 86400)
+        return f"{dias} dia{'s' if dias > 1 else ''} atrás"
 
 #Criar páginas de erro
 
