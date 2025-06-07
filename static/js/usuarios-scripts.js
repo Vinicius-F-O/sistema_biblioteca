@@ -3,18 +3,49 @@ document.addEventListener("DOMContentLoaded", function () {
   const userTabs = document.querySelectorAll(
     '#userTabs button[data-bs-toggle="tab"]'
   );
-  let currentUserTab = "clients-tab"; // valor padrão
+  const tabInput = document.getElementById("tab-input");
 
-  // Atualiza botão + aba ativa
+  const urlParams = new URLSearchParams(window.location.search);
+  const activeTab = urlParams.get("tab");
+
+  function updateAllTabInputs(value) {
+    // Atualiza o input principal (se existir)
+    if (tabInput) tabInput.value = value;
+    
+    // Atualiza TODOS os inputs de tab nas barras de pesquisa
+    document.querySelectorAll('input[name="tab"][id^="search-tab-input"]').forEach(input => {
+      input.value = value;
+    });
+  }
+
+  // Ativa a aba baseada na URL
+  if (activeTab === "staff") {
+    const staffTab = document.getElementById("staff-tab");
+    if (staffTab) new bootstrap.Tab(staffTab).show();
+  } else {
+    const clientsTab = document.getElementById("clients-tab");
+    if (clientsTab) new bootstrap.Tab(clientsTab).show();
+  }
+
+  // Atualiza botão, input oculto e URL ao trocar de aba
   userTabs.forEach((tab) => {
     tab.addEventListener("shown.bs.tab", function (event) {
-      currentUserTab = event.target.id;
+      const tabId = event.target.id;
 
-      if (currentUserTab === "clients-tab") {
-        addUserBtn.innerHTML = `<i class="fas fa-plus me-2"></i> Adicionar Cliente`;
-      } else if (currentUserTab === "staff-tab") {
+      let tabValue = "clients";
+      if (tabId === "staff-tab") {
+        tabValue = "staff";
         addUserBtn.innerHTML = `<i class="fas fa-plus me-2"></i> Adicionar Funcionário`;
+      } else {
+        addUserBtn.innerHTML = `<i class="fas fa-plus me-2"></i> Adicionar Cliente`;
       }
+
+      updateAllTabInputs(tabValue);
+
+      // Atualiza a URL com o parâmetro correto
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.set("tab", tabValue);
+      history.replaceState(null, "", newUrl);
     });
   });
 
@@ -124,6 +155,36 @@ togglePassword.addEventListener("click", function () {
   passwordField.setAttribute("type", type);
   this.querySelector("i").classList.toggle("fa-eye-slash");
 });
+
+// Edição de Funcionário
+const editarPasswordField = document.getElementById("editarSenhaFuncionario");
+const toggleEditarSenha = document.getElementById("toggleEditarSenha");
+const gerarEditarSenha = document.getElementById("gerarEditarSenha");
+
+if (toggleEditarSenha && editarPasswordField) {
+  toggleEditarSenha.addEventListener("click", function () {
+    const type =
+      editarPasswordField.getAttribute("type") === "password"
+        ? "text"
+        : "password";
+    editarPasswordField.setAttribute("type", type);
+    this.querySelector("i").classList.toggle("fa-eye-slash");
+  });
+}
+
+if (gerarEditarSenha && editarPasswordField) {
+  gerarEditarSenha.addEventListener("click", function () {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let password = "";
+    for (let i = 0; i < 8; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    editarPasswordField.value = password;
+    editarPasswordField.setAttribute("type", "text");
+    toggleEditarSenha.querySelector("i").classList.add("fa-eye-slash");
+  });
+}
 
 // Máscara para CPF
 document.getElementById("clientCpf").addEventListener("input", function (e) {

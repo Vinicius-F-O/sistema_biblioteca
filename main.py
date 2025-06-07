@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from db import db
 from models import Funcionario, Livro, Cliente, Servico
@@ -7,6 +8,14 @@ from datetime import datetime, date
 import hashlib
 from sqlalchemy import func
 from collections import defaultdict
+
+def parse_datetime(dt_str):
+    if not dt_str:
+        return None
+    try:
+        return datetime.strptime(dt_str, '%Y-%m-%dT%H:%M')
+    except ValueError:
+        return None
 
 #Criar uma instância do Flask
 app = Flask(__name__)
@@ -206,6 +215,18 @@ def estoque():
     if request.method == 'GET':
         livros = Livro.query.all()
         qtdLivros = len(livros)
+        query = request.args.get('q', '').strip()  # pega o valor da barra de busca, se existir
+
+        if query:
+            livros = Livro.query.filter(
+                or_(
+                    Livro.titulo.ilike(f"%{query}%"),
+                    Livro.autor.ilike(f"%{query}%"),  # exemplo de outro campo
+                    Livro.editora.ilike(f"%{query}%")   # outro exemplo, se existir
+                )
+            ).all()
+        else:
+            livros = Livro.query.all()
 
         #Valor total em estoque (preço * quantidade)
         valor_estoque = sum(float(l.preco) * int(l.qtdEstoque) for l in livros)
@@ -261,7 +282,16 @@ def servicos():
         clientes = Cliente.query.all()
         livros_objs = Livro.query.all()
         servicos = Servico.query.all()
+        query = request.args.get('q', '').strip()
 
+        if query:
+            servicos = [
+                s for s in servicos if
+                query.lower() in str(s.id).lower() or
+                query.lower() in s.livro.titulo.lower() or
+                query.lower() in s.cliente.nome.lower()
+            ]
+        
         hoje = datetime.now().date()
         mes_atual = hoje.month
         ano_atual = hoje.year
@@ -339,8 +369,8 @@ def servicos():
             status_servico = request.form.get('statusForm') or 'Ativo'
 
             # Conversão de datas
-            data_servico = datetime.strptime(data_servico, '%Y-%m-%d') if data_servico else datetime.utcnow()
-            data_devolucao = datetime.strptime(data_devolucao, '%Y-%m-%d') if data_devolucao else None
+            data_servico = parse_datetime(request.form.get('dataForm')) or datetime.now()
+            data_devolucao = parse_datetime(request.form.get('dataDevolucaoForm')) or datetime.now()
 
             # Busca nas tabelas
             cliente = Cliente.query.filter_by(cpf=cpf_cliente).first()
@@ -402,8 +432,26 @@ def servicos():
 @login_required
 def usuarios():
     if request.method == 'GET':
-        funcionarios = Funcionario.query.all()
-        clientes = Cliente.query.all()
+        query = request.args.get('q', '').strip()  # pega o valor da barra de busca, se existir
+        if query:
+            funcionarios = Funcionario.query.filter(
+                or_(
+                    Funcionario.nome.ilike(f"%{query}%"),
+                    Funcionario.email.ilike(f"%{query}%"),  # exemplo de outro campo
+                    Funcionario.cargo.ilike(f"%{query}%")   # outro exemplo, se existir
+                )
+            ).all()
+
+            clientes = Cliente.query.filter(
+                or_(
+                    Cliente.nome.ilike(f"%{query}%"),
+                    Cliente.email.ilike(f"%{query}%"),
+                    Cliente.cpf.ilike(f"%{query}%")  # outro exemplo de campo
+                )
+            ).all()
+        else:
+            funcionarios = Funcionario.query.all()
+            clientes = Cliente.query.all()
 
         # Adiciona contagem de empréstimos ativos e multas pendentes para cada cliente
         for cliente in clientes:
@@ -429,11 +477,14 @@ def usuarios():
             "valor_multas": valor_multas,
         }
 
+        active_tab = request.args.get('tab', 'clients')  # 'clients' é o padrão
+
         return render_template(
             "usuarios.html",
             funcionarios=funcionarios,
             clientes=clientes,
-            stats_usuarios=stats_usuarios
+            stats_usuarios=stats_usuarios,
+            active_tab=active_tab  # opcional
         )
 
     elif request.method == 'POST':
@@ -634,7 +685,7 @@ def editar_livro(id):
 @login_required
 def devolver_servico(servico_id):
     servico = Servico.query.get_or_404(servico_id)
-    data_devolucao = datetime.utcnow()
+    data_devolucao = datetime.now()
     servico.dataDevolucao = data_devolucao  # Certifique-se de ter esse campo no modelo
 
     multa_por_dia = 2.00  # Valor da multa por dia de atraso em R$
@@ -701,6 +752,7 @@ def editar_funcionario(id):
     funcionario.cargo = cargo
     if nova_senha:
         funcionario.senha = hash(nova_senha)
+        funcionario.senha_temporaria = True
 
     db.session.commit()
     flash('Funcionário atualizado com sucesso!', 'success')

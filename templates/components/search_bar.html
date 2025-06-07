@@ -1,0 +1,9 @@
+{# templates/components/search_bar.html #}
+<form method="get" action="{{ action_url }}">
+    <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="{{ placeholder }}" value="{{ request.args.get('q', '') }}">
+        <button class="btn btn-outline-secondary" type="submit">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+</form>

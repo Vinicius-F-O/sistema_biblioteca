@@ -162,11 +162,11 @@
                 <h1 class="dashboard-title fs-3 fw-bold mb-4 text-dark">Dashboard</h1>
 
                 <!-- Botão temporário para debug do modal de troca de senha -->
-                <div class="mb-3">
+                <!--<div class="mb-3">
                     <button type="button" class="btn btn-warning" onclick="abrirModalTrocarSenha()">
                         Abrir Modal de Troca de Senha (DEBUG)
                     </button>
-                </div>
+                </div>-->
                 <!-- Fim do botão temporário -->
 
                 <!-- Stats Cards -->
@@ -312,7 +312,7 @@
                             <div
                                 class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
                                 <h3 class="card-title fs-6 m-0">Atividades Recentes</h3>
-                                <a href="#" class="text-primary small text-decoration-none">Ver todas</a>
+                                <a href="/servicos" class="text-primary small text-decoration-none">Ver todas</a>
                             </div>
                             <div class="card-body">
                                 {% for servico, cliente, livro in atividades_recentes %}

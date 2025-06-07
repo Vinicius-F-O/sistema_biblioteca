@@ -149,12 +149,9 @@
                 <div class="barra-container mb-0">
                     <div class="row barra-busca mx-0">
                         <div class="col-md-8">
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Buscar livro, valor ou código...">
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="fas fa-filter"></i> Filtrar
-                                </button>
-                            </div>
+                            {% set action_url = url_for('estoque') %}
+                            {% set placeholder = 'Buscar por livro, valor ou código...' %}
+                            {% include "components/search_bar.html" with context %}
                         </div>
                         <div class="col-md-4 text-end">
                             <button class="btn btn-adicionar border-0" data-bs-toggle="modal"

@@ -63,8 +63,36 @@ saleRadio.addEventListener("change", function () {
   dueDateField.value = "";
 });
 
-// Set default date to today
-document.getElementById("transactionDate").valueAsDate = new Date();
+// ================== DATA COM HORÁRIO ATUAL ==================
+const now = new Date();
+const pad = (n) => n.toString().padStart(2, "0");
+
+const formattedNow = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
+  now.getDate()
+)}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+document.getElementById("transactionDate").value = formattedNow;
+
+// Se for empréstimo, soma 7 dias para data de devolução
+loanRadio.addEventListener("change", function () {
+  dueDateField.disabled = false;
+  dueDateField.required = true;
+
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 7);
+
+  const formattedDueDate = `${dueDate.getFullYear()}-${pad(
+    dueDate.getMonth() + 1
+  )}-${pad(dueDate.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+  dueDateField.value = formattedDueDate;
+});
+
+saleRadio.addEventListener("change", function () {
+  dueDateField.disabled = true;
+  dueDateField.required = false;
+  dueDateField.value = "";
+});
 
 // ================== BUSCA DE LIVRO ==================
 const input = document.getElementById("bookSearch");
@@ -189,9 +217,13 @@ inputCPF.addEventListener("input", () => {
                     <i class="fas fa-envelope me-1"></i> ${data.email}
                   </span>
                   ${multaInfo}
-                  ${data.status === "Inativo" ? `<span class="small text-muted">
+                  ${
+                    data.status === "Inativo"
+                      ? `<span class="small text-muted">
                     <i class="fas fa-info-circle me-1"></i>Status: ${data.status}
-                  </span>` : ""}
+                  </span>`
+                      : ""
+                  }
                 </div>
               </div>
             </div>
@@ -290,11 +322,12 @@ document.querySelectorAll(".btn-pagamento").forEach((btn) => {
         document.getElementById("multaMotivo").textContent =
           servico.motivoMulta;
         document.getElementById("multaDataDevolucao").textContent =
-          servico.dataDevolucao || '-';
+          servico.dataDevolucao || "-";
         document.getElementById("multaDataDevolucaoReal").textContent =
-          servico.dataDevolucaoReal || '-';
-        document.getElementById("multaValor").textContent =
-          `R$ ${parseFloat(servico.multa).toFixed(2)}`;
+          servico.dataDevolucaoReal || "-";
+        document.getElementById("multaValor").textContent = `R$ ${parseFloat(
+          servico.multa
+        ).toFixed(2)}`;
       });
   });
 });

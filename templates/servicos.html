@@ -182,13 +182,11 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
-                            <div class="input-group">
-                                <input type="text" class="form-control"
-                                    placeholder="Buscar por livro, usuário ou código...">
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
+                            <form method="get" action="{{ url_for('servicos') }}">
+                                {% set action_url = url_for('servicos') %}
+                                {% set placeholder = 'Buscar por livro, cliente ou ID...' %}
+                                {% include "components/search_bar.html" with context %}
+                            </form>
                         </div>
                         <div class="col-md-4">
                             <div class="d-flex gap-2">
@@ -255,7 +253,8 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {{ servico.dataDevolucao.strftime('%d/%m/%Y') if servico.dataDevolucao else '-' }}
+                                        {{ servico.dataDevolucao.strftime('%d/%m/%Y') if servico.dataDevolucao else '-'
+                                        }}
                                     </td>
                                     <td>
                                         {% if servico.categoriaServico == 'Venda' %}
@@ -377,12 +376,12 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="transactionDate" class="form-label">Data *</label>
-                                            <input type="date" class="form-control" id="transactionDate" name="dataForm"
-                                                required>
+                                            <input type="datetime-local" class="form-control" id="transactionDate"
+                                                name="dataForm" required>
                                         </div>
                                         <div class="mb-3">
                                             <label for="dueDate" class="form-label">Data de Devolução</label>
-                                            <input type="date" class="form-control" id="dueDate"
+                                            <input type="datetime-local" class="form-control" id="dueDate"
                                                 name="dataDevolucaoForm">
                                         </div>
                                         <div class="mb-3">
@@ -464,7 +463,8 @@
                                                 Cliente</span></p>
                                         <p class="small text-muted mb-1">Data prev. devolução: <span
                                                 id="multaDataDevolucao">00/00/0000</span></p>
-                                        <p class="small text-muted mb-1">Data de devolução: <span id="multaDataDevolucaoReal">-</span></p>
+                                        <p class="small text-muted mb-1">Data de devolução: <span
+                                                id="multaDataDevolucaoReal">-</span></p>
                                     </div>
                                 </div>
 
