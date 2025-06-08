@@ -1,0 +1,60 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/sidebar.css') }}">
+<aside class="sidebar" id="sidebar">
+    <div
+        class="sidebar-header p-3 d-flex justify-content-between align-items-center border-bottom border-light border-opacity-10">
+        <h2 class="m-0 fs-5 d-flex align-items-center gap-2">
+            <i class="fas fa-book"></i>
+            <span class="sidebar-text">Codex</span>
+        </h2>
+        <button class="toggle-btn btn btn-link text-white p-0" id="toggle-btn">
+            <i id="sidebar-toggle-icon" class="fas fa-bars"></i>
+        </button>
+    </div>
+    <ul class="sidebar-menu list-unstyled p-0 m-0">
+        <li class="{% if active_page == 'dashboard' %}active{% endif %}">
+            <a href="/" class="text-white text-decoration-none d-flex align-items-center p-3">
+                <i class="fas fa-home mx-2"></i>
+                <span class="sidebar-text">Dashboard</span>
+            </a>
+        </li>
+        <li class="{% if active_page == 'estoque' %}active{% endif %}">
+            <a href="/estoque" class="text-white text-decoration-none d-flex align-items-center p-3">
+                <i class="fas fa-book-open mx-2"></i>
+                <span class="sidebar-text">Estoque</span>
+            </a>
+        </li>
+        <li class="{% if active_page == 'usuarios' %}active{% endif %}">
+            <a href="/usuarios" class="text-white text-decoration-none d-flex align-items-center p-3">
+                <i class="fas fa-users mx-2"></i>
+                <span class="sidebar-text">Usuários</span>
+            </a>
+        </li>
+        <li class="{% if active_page == 'servicos' %}active{% endif %}">
+            <a href="/servicos" class="text-white text-decoration-none d-flex align-items-center p-3">
+                <i class="fas fa-exchange-alt mx-2"></i>
+                <span class="sidebar-text">Empréstimos & vendas</span>
+            </a>
+        </li>
+        <!--
+        <li>
+            <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                <i class="fas fa-chart-bar mx-2"></i>
+                <span class="sidebar-text">Relatórios</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
+                <i class="fas fa-cog mx-2"></i>
+                <span class="sidebar-text">Configurações</span>
+            </a>
+        </li>
+        -->
+    </ul>
+    <div class="sidebar-footer p-3 border-top border-light border-opacity-10 position-absolute bottom-0 w-100">
+        <a href="https://www.youtube.com/watch?v=-oYMo8k22Vw" class="text-white text-decoration-none d-flex align-items-center">
+            <i class="fas fa-question-circle mx-2"></i>
+            <span class="sidebar-text">Ajuda</span>
+        </a>
+    </div>
+</aside>
+<script src="{{ url_for('static', filename='js/components/sidebar-scripts.js') }}"></script>

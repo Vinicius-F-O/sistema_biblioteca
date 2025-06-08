@@ -1,0 +1,54 @@
+{# templates/components/editar_perfil.html #}
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileModalLabel">Editar Perfil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <!-- Foto do usuário -->
+                    <div class="text-center mb-3">
+                        <img src="https://ui-avatars.com/api/?name={{current_user.nome}}&background=7B2CBF&color=fff&size=120&rounded=true&bold=true"
+                            alt="Avatar de {{current_user.nome}}" id="profilePreview"
+                            style="width: 100px; height: 100px; object-fit: cover;"
+                            class="profile-img rounded-circle border border-0 border-primary">
+                        <br>
+                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="changePhotoBtn">
+                            Trocar Foto
+                        </button>
+                        <input type="file" id="profilePhotoInput" accept="image/*" class="d-none">
+                    </div>
+
+                    <!-- Campos -->
+                    <div class="mb-3">
+                        <label for="nameInput" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nameInput" value="{{current_user.nome}}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailInput" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="emailInput" value="{{current_user.email}}">
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer d-flex justify-content-between">
+                <!-- Botão de Logout alinhado à esquerda -->
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                    <i class="fas fa-sign-out-alt me-1"></i> Sair
+                </a>
+
+                <!-- Grupo de botões de ação do modal alinhado à direita -->
+                <div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="profileForm" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/components/editar_perfil-scripts.js') }}"></script>

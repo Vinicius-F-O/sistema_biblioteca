@@ -45,7 +45,7 @@ class Cliente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     cpf = db.Column(db.String(15), nullable=True, unique=True)
-    email = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
     telefone = db.Column(db.String(20), nullable=False)
     statusCliente = db.Column(db.String(20), nullable=True)
 

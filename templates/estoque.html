@@ -16,62 +16,7 @@
 <body>
     <div class="d-flex">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div
-                class="sidebar-header p-3 d-flex justify-content-between align-items-center border-bottom border-light border-opacity-10">
-                <h2 class="m-0 fs-5 d-flex align-items-center gap-2">
-                    <i class="fas fa-book"></i>
-                    <span class="sidebar-text">Codex</span>
-                </h2>
-                <button class="toggle-btn btn btn-link text-white p-0" id="toggle-btn">
-                    <i id="sidebar-toggle-icon" class="fas fa-bars"></i>
-                </button>
-            </div>
-            <ul class="sidebar-menu list-unstyled p-0 m-0">
-                <li>
-                    <a href="/" class="text-white text-decoration-none d-flex align-items-center p-3">
-                        <i class="fas fa-home mx-2"></i>
-                        <span class="sidebar-text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="active">
-                    <a href="/estoque" class="text-white text-decoration-none d-flex align-items-center p-3">
-                        <i class="fas fa-book-open mx-2"></i>
-                        <span class="sidebar-text">Estoque</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/usuarios" class="text-white text-decoration-none d-flex align-items-center p-3">
-                        <i class="fas fa-users mx-2"></i>
-                        <span class="sidebar-text">Usuários</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/servicos" class="text-white text-decoration-none d-flex align-items-center p-3">
-                        <i class="fas fa-exchange-alt mx-2"></i>
-                        <span class="sidebar-text">Empréstimos & Vendas</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
-                        <i class="fas fa-chart-bar mx-2"></i>
-                        <span class="sidebar-text">Relatórios</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="text-white text-decoration-none d-flex align-items-center p-3">
-                        <i class="fas fa-cog mx-2"></i>
-                        <span class="sidebar-text">Configurações</span>
-                    </a>
-                </li>
-            </ul>
-            <div class="sidebar-footer p-3 border-top border-light border-opacity-10 position-absolute bottom-0 w-100">
-                <a href="#" class="text-white text-decoration-none d-flex align-items-center">
-                    <i class="fas fa-question-circle mx-2"></i>
-                    <span class="sidebar-text">Ajuda</span>
-                </a>
-            </div>
-        </aside>
+        {% include "components/sidebar.html" with context %}
 
         <!-- Main Content -->
         <main class="main-content flex-grow-1 p-3">
@@ -84,62 +29,14 @@
                         alt="Avatar de {{current_user.nome}}" class="profile-img">
                     <div class="profile-info d-flex flex-column">
                         <span class="profile-name fw-bold fs-6">{{current_user.nome}}</j></span>
-                        <span class="profile-role text-muted small">Bibliotecária</span>
+                        <span class="profile-role text-muted small">{{current_user.cargo}}</span>
                     </div>
                     <i class="fas fa-chevron-down text-muted small"></i>
                 </div>
             </div>
 
             <!-- Modal -->
-            <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="profileModalLabel">Editar Perfil</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Fechar"></button>
-                        </div>
-
-                        <div class="modal-body">
-                            <form id="profileForm">
-                                <!-- Foto do usuário -->
-                                <div class="text-center mb-3">
-                                    <img src="https://ui-avatars.com/api/?name={{current_user.nome}}&background=7B2CBF&color=fff&size=120&rounded=true&bold=true"
-                                        alt="Avatar de {{current_user.nome}}" id="profilePreview"
-                                        style="width: 100px; height: 100px; object-fit: cover;"
-                                        class="profile-img rounded-circle border border-0 border-primary">
-                                    <br>
-                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2"
-                                        id="changePhotoBtn">
-                                        Trocar Foto
-                                    </button>
-                                    <input type="file" id="profilePhotoInput" accept="image/*" class="d-none">
-                                </div>
-
-                                <!-- Campos -->
-                                <div class="mb-3">
-                                    <label for="nameInput" class="form-label">Nome</label>
-                                    <input type="text" class="form-control" id="nameInput"
-                                        value="{{current_user.nome}}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="emailInput" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="emailInput"
-                                        value="{{current_user.email}}">
-                                </div>
-                            </form>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" form="profileForm" class="btn btn-primary">Salvar Alterações</button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
+            {% include "components/editar_perfil.html" with context %}
 
             <!-- Estoque Content -->
             <div class="estoque-content">

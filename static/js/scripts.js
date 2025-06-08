@@ -1,46 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Toggle Sidebar
-  const toggleBtn = document.getElementById("toggle-btn");
-  const sidebar = document.getElementById("sidebar");
-
-  toggleBtn.addEventListener("click", function () {
-    sidebar.classList.toggle("collapsed");
-
-    const icon = document.getElementById("sidebar-toggle-icon");
-
-    // Alterna o ícone entre 'fa-bars' e 'fa-chevron-right'
-    if (sidebar.classList.contains("collapsed")) {
-      icon.classList.remove("fa-bars");
-      icon.classList.add("fa-chevron-right");
-    } else {
-      icon.classList.remove("fa-chevron-right");
-      icon.classList.add("fa-bars");
-    }
-
-    // Em mobile, alternar a classe 'active'
-    if (window.innerWidth <= 768) {
-      sidebar.classList.toggle("active");
-    }
-  });
-
-  // Fechar sidebar quando clicar fora (em mobile)
-  document.addEventListener("click", function (e) {
-    if (
-      window.innerWidth <= 768 &&
-      !sidebar.contains(e.target) &&
-      e.target !== toggleBtn
-    ) {
-      sidebar.classList.remove("active");
-    }
-  });
-
-  // Atualizar layout quando a janela for redimensionada
-  window.addEventListener("resize", function () {
-    if (window.innerWidth > 768) {
-      sidebar.classList.remove("active");
-    }
-  });
-
   // Gráfico de Empréstimos Mensais
   const loansCtx = document.getElementById("loansChart").getContext("2d");
   const loansChart = new Chart(loansCtx, {
@@ -121,41 +79,6 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       },
     },
-  });
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const photoBtn = document.getElementById("changePhotoBtn");
-    const photoInput = document.getElementById("profilePhotoInput");
-    const preview = document.getElementById("profilePreview");
-
-    photoBtn.addEventListener("click", () => {
-      photoInput.click();
-    });
-
-    photoInput.addEventListener("change", (e) => {
-      if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          preview.src = event.target.result;
-        };
-        reader.readAsDataURL(e.target.files[0]);
-      }
-    });
-
-    document
-      .getElementById("profileForm")
-      .addEventListener("submit", function (e) {
-        e.preventDefault();
-        // Aqui você pode capturar os dados e enviar para o backend
-        const nome = document.getElementById("nameInput").value;
-        const email = document.getElementById("emailInput").value;
-
-        alert(`Perfil atualizado!\nNome: ${nome}\nEmail: ${email}`);
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById("profileModal")
-        );
-        modal.hide();
-      });
   });
 });
 

@@ -1,28 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Toggle Sidebar
-  const toggleBtn = document.getElementById("toggle-btn");
-  const sidebar = document.getElementById("sidebar");
-
-  toggleBtn.addEventListener("click", function () {
-    sidebar.classList.toggle("collapsed");
-
-    const icon = document.getElementById("sidebar-toggle-icon");
-
-    // Alterna o ícone entre 'fa-bars' e 'fa-chevron-right'
-    if (sidebar.classList.contains("collapsed")) {
-      icon.classList.remove("fa-bars");
-      icon.classList.add("fa-chevron-right");
-    } else {
-      icon.classList.remove("fa-chevron-right");
-      icon.classList.add("fa-bars");
-    }
-
-    // Em mobile, alternar a classe 'active'
-    if (window.innerWidth <= 768) {
-      sidebar.classList.toggle("active");
-    }
-  });
-
   // Toggle favorito
   document.querySelectorAll(".btn-link.text-warning").forEach((btn) => {
     btn.addEventListener("click", function (e) {

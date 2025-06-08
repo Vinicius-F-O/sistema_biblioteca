@@ -150,7 +150,8 @@ def home():
         generos_labels=generos_labels,
         generos_counts=generos_counts,
         stats=stats,
-        senha_temporaria=getattr(current_user, 'senha_temporaria', False)
+        senha_temporaria=getattr(current_user, 'senha_temporaria', False),
+        active_page='dashboard'
     )
 
 @app.route('/cadastro', methods=['GET', 'POST'])
@@ -251,7 +252,8 @@ def estoque():
             custo_estoque=custo_estoque,
             lucro_previsto=lucro_previsto,
             estoque_baixo=estoque_baixo,
-            sem_estoque=sem_estoque
+            sem_estoque=sem_estoque,
+            active_page='estoque'
         )
     
     elif request.method == 'POST':
@@ -356,7 +358,8 @@ def servicos():
                 "devolucoes_pendentes": len(devolucoes_pendentes),
                 "devolucoes_hoje": len(devolucoes_hoje),
                 "receita_mensal": f"R$ {receita_mensal:,.2f}".replace(".", ",").replace(",", ".", 1)
-            }
+            },
+            active_page='servicos'
         )
     elif request.method == 'POST':
         try:
@@ -484,7 +487,8 @@ def usuarios():
             funcionarios=funcionarios,
             clientes=clientes,
             stats_usuarios=stats_usuarios,
-            active_tab=active_tab  # opcional
+            active_tab=active_tab,  # opcional
+            active_page='usuarios'
         )
 
     elif request.method == 'POST':
