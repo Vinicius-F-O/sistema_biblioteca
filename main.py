@@ -27,7 +27,7 @@ lm.login_message_category = "warning"
 
 #Adicionar database
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dados.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:125867Ju@localhost/biblioteca_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:SuaSenhaAqui@localhost/biblioteca_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Recomendado
 db.init_app(app)
 
