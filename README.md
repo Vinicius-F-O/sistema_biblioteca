@@ -42,7 +42,7 @@ Este projeto foi desenvolvido utilizando as seguintes tecnologias:
 * **Flask**
 * **HTML5, CSS3, JavaScript**
 * **MySQL**
-* [Jinja2 foi utilizado como ferramente de templates]
+* [Jinja2 foi utilizado como ferramenta de templates]
 
 ## ⚙️ Como Rodar o Sistema Localmente
 
